@@ -1,0 +1,30 @@
+{
+  "name": "braudfront",
+  "version": "0.0.1",
+  "description": "kasir braud",
+  "productName": "braud",
+  "cordovaId": "org.cordova.quasar.app",
+  "author": "bdsm",
+  "private": true,
+  "scripts": {
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "dependencies": {
+    "@quasar/extras": "^1.0.0",
+    "axios": "^0.18.1",
+    "quasar": "^1.0.5",
+    "numeral": "^2.0.6",
+    "vue-html-to-paper": "^1.1.0"
+  },
+  "devDependencies": {
+    "@quasar/app": "^1.0.0"
+  },
+  "engines": {
+    "node": ">= 8.9.0",
+    "npm": ">= 5.6.0",
+    "yarn": ">= 1.6.0"
+  },
+  "browserslist": [
+    "last 1 version, not dead, ie >= 11"
+  ]
+}

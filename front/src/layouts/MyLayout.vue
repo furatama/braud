@@ -1,7 +1,7 @@
 <template>
   <q-layout view="hHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar class="text-brand">
+      <q-toolbar class="title-brand">
         <q-btn
           flat
           dense
@@ -31,7 +31,7 @@
         <q-list bordered>
           <template v-for="link in links" >
             <q-item v-if="!link.child && (roleChecker(link.role))" :key="link.label"
-              clickable v-ripple active-class="text-blue-grey" class="link-brand" :to="link.to"
+              clickable v-ripple active-class="text-grey" class="link-brand" :to="link.to"
             >
               <q-item-section avatar>
                 <q-icon :name="link.icon" />
@@ -117,9 +117,7 @@ export default {
       get() { return this.$store.getters.getName }
     },
     role: {
-      get() { 
-        return this.$store.getters.getRole 
-      }
+      get() { return this.$store.getters.getRole }
     }
   },
   methods: {

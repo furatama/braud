@@ -1,7 +1,7 @@
 import numeral from 'numeral'
 
 export default async ({ Vue }) => {
-  numeral.register('locale', 'fr', {
+  numeral.register('locale', 'id', {
     delimiters: {
         thousands: '.',
         decimal: ','
@@ -18,7 +18,7 @@ export default async ({ Vue }) => {
   });
 
   // switch between locales
-  numeral.locale('fr');
+  numeral.locale('id');
 
   Vue.prototype.$numeral = numeral
   Vue.prototype.$numeralVal = (val) => {return numeral(val).value()}

@@ -1,6 +1,11 @@
 import axios from 'axios'
 
-export default async ({ Vue }) => {
-  Vue.prototype.$axios = axios
-  // Vue.prototype.$axiosFetch 
+const axiosInstance = axios.create({
+  // baseURL: 'http://localhost/bdsm-laravel-boilerplate/public'
+})
+
+export default ({ Vue }) => {
+  Vue.prototype.$axios = axiosInstance
 }
+
+export { axiosInstance as axios }

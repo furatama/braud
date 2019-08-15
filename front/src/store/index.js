@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 import data from './module-data'
-import axios from 'axios'
+import { axios } from 'boot/axios'
 import { LocalStorage } from 'quasar'
 
 Vue.use(Vuex)

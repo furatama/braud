@@ -11,6 +11,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+/patch
+patch.7z
+patch.zip
+
 # Editor directories and files
 .idea
 .vscode

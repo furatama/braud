@@ -4,7 +4,7 @@
     <m-table  
       title="Master Test"
       :columns="columns"
-      :fetchURL="fetchURL"
+      :resourceURL="resourceURL"
       :inputs="inputs"
     >
     </m-table>
@@ -21,7 +21,7 @@ export default {
   },
   data() {
     return {
-      fetchURL: "/api/test",
+      resourceURL: "/api/test",
       columns: [
         { name: 'int', type: 'integer'},
         { name: 'str', type: 'string'},

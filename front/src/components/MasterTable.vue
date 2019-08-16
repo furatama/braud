@@ -58,13 +58,13 @@
     <!--  -->
 
     <q-page-sticky position="top" :offset="[0, 5]">
-      <q-btn dense class="q-px-sm" rounded icon="add" label="data" color="positive" @click="formDialog = true" />
+      <q-btn dense class="q-px-sm" rounded icon="add" label="data" color="positive" @click="onNew()" />
     </q-page-sticky>
     
     <q-dialog v-model="formDialog">
       <q-card>
         <q-bar class="bg-primary text-white">
-          <div class="text-h6">{{editId === null ? 'Tambah' : 'Ubah'}} {{title}}</div>
+          <div class="text-h6">{{editID === null ? 'Tambah' : 'Ubah'}} {{title}}</div>
           <q-space />
           <q-btn dense flat icon="close" v-close-popup>
             <q-tooltip>Close</q-tooltip>
@@ -96,7 +96,7 @@
         </q-card-section>
         <q-card-actions>
           <div class="row justify-end q-my-xs">
-            <q-btn :loading="loading" :label="!editId ? 'Tambah Data' : 'Ubah Data'" color="positive" @click="onSubmit"/>
+            <q-btn :loading="loading" :label="!editID ? 'Tambah Data' : 'Ubah Data'" color="positive" @click="onSubmit"/>
           </div>
         </q-card-actions>
       </q-card>
@@ -113,7 +113,7 @@ export default {
     columns: Array,
     visibleColumns: Array,
     resource: String,
-    fetchURL: String,
+    resourceURL: String,
     inputs: Array
   },
   data () {
@@ -131,8 +131,9 @@ export default {
       cols: [],
       inps: [],
       nomor: 1,
-      editId: null,
+      editID: null,
       formDialog: false,
+      defInps: []
     }
   },
   computed: {
@@ -154,7 +155,7 @@ export default {
     fetchFromServer(filter,paginate,page,sortBy,descending) {
       this.loading = true
       return new Promise((resolve, reject) => {
-        this.$axios.get(this.fetchURL, {
+        this.$axios.get(this.resourceURL, {
           headers: {
             'Authorization' : 'Bearer ' + this.$store.getters.getToken,
           },
@@ -180,10 +181,10 @@ export default {
         })
       })
     },
-    deleteFromServer(id) {
+    fetchByID(id) {
       this.loading = true
       return new Promise((resolve, reject) => {
-        this.$axios.delete(this.fetchURL + `/${id}`, {
+        this.$axios.get(this.resourceURL + `/${id}`, {
           headers: {
             'Authorization' : 'Bearer ' + this.$store.getters.getToken,
           }
@@ -201,10 +202,51 @@ export default {
         })
       })
     },
-    postToServer(url,inputs) {
+    deleteFromServer(id) {
       this.loading = true
       return new Promise((resolve, reject) => {
-        this.$axios.post(url, {
+        this.$axios.delete(this.resourceURL + `/${id}`, {
+          headers: {
+            'Authorization' : 'Bearer ' + this.$store.getters.getToken,
+          }
+        }).then((response) => {
+          const body = response.data
+          if (body.status === "success") {
+            resolve(body.data)
+          } else {
+            reject(response)
+          }
+        }).catch((error) => {
+          reject(error)
+        }).finally(() => {
+          this.loading = false
+        })
+      })
+    },
+    postToServer(inputs) {
+      this.loading = true
+      return new Promise((resolve, reject) => {
+        this.$axios.post(this.resourceURL, {
+          ...inputs,
+          token: this.$store.getters.getToken
+        }).then((response) => {
+          const body = response.data
+          if (body.status === "success") {
+            resolve(body.data)
+          } else {
+            reject(response)
+          }
+        }).catch((error) => {
+          reject(error)
+        }).finally(() => {
+          this.loading = false
+        })
+      })
+    },
+    updateToServer(id,inputs) {
+      this.loading = true
+      return new Promise((resolve, reject) => {
+        this.$axios.put(this.resourceURL + `/${id}`, {
           ...inputs,
           token: this.$store.getters.getToken
         }).then((response) => {
@@ -238,6 +280,12 @@ export default {
           this.$notifyNegative('Ada Sebuah Kesalahan')
         })
     },
+    rerequest() {
+      this.onRequest({
+        pagination: this.pagination,
+        filter: this.filter
+      })
+    },
     onDelete(row) {
       this.deleteFromServer(row.id).then((data) => {
         this.$notifyPositive('Data Berhasil Dihapus')
@@ -245,27 +293,62 @@ export default {
         console.log(error)
         this.$notifyNegative('Ada Sebuah Kesalahan')
       }).finally(() => {
-        this.onRequest({
-          pagination: this.pagination,
-          filter: this.filter
-        })
+        this.rerequest()
       })
     },
+    onEdit(row) {
+      this.editID = row.id
+      this.fetchByID(row.id).then((data) => {
+        this.inps = this.inps.map((input) => {
+          return {
+            ...input,
+            value: data.data[input.name]
+          }
+        })
+        this.formDialog = true
+      }).catch((error) => {
+        console.log(error)
+        this.$notifyNegative('Ada Sebuah Kesalahan')
+      })
+    },
+    onNew() {
+      this.editID = null
+      this.resetForm()
+      this.formDialog = true
+    },
     onSubmit() {
-      let url = this.editId ? this.fetchURL + `/${this.id}` : this.fetchURL
       let inputs = {}
       this.inps.forEach((input) => {
         inputs[input.name] = input.value
       })
-      console.log(inputs)
-      this.postToServer(url,inputs).then((data) => {
-        if (!this.editId)
-          this.$notifyPositive('Data Berhasil Dimasukkan')
-        else
+      let afterSubmit = () => {
+        this.resetForm()
+        this.formDialog = false
+        this.rerequest()
+      }
+      if (this.editID) {
+        this.updateToServer(this.editID,inputs).then((data) => {
           this.$notifyPositive('Data Berhasil Diubah')
-      }).catch((error) => {
-        console.log(error)
-        this.$notifyNegative('Ada Sebuah Kesalahan')
+        }).catch((error) => {
+          console.log(error)
+          this.$notifyNegative('Ada Sebuah Kesalahan')
+        }).finally(afterSubmit)
+      } else {
+        this.postToServer(inputs).then((data) => {
+          this.$notifyPositive('Data Berhasil Dimasukkan')
+        }).catch((error) => {
+          console.log(error)
+          this.$notifyNegative('Ada Sebuah Kesalahan')
+        }).finally(afterSubmit)
+      }
+    },
+    resetForm() {
+      this.inps = this.inputs.map((inp) => {
+        return {
+          ...inp,
+          label: inp.label ? inp.label : inp.name.toUpperCase(),
+          value: inp.default ? inp.default : ''
+        }
       })
     }
   },
@@ -291,14 +374,7 @@ export default {
       ...this.cols,
       {name: 'action', label: '', sortable: false}
     ]
-
-    this.inps = this.inputs.map((inp) => {
-      return {
-        ...inp,
-        label: inp.label ? inp.label : inp.name.toUpperCase(),
-        value: inp.default ? inp.default : ''
-      }
-    })
+    this.resetForm()
   },
   mounted () {
     // get initial data from server (1st page)

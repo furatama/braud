@@ -55,14 +55,12 @@
       </template>
     </q-table>
 
-    <!--  -->
+    <q-btn dense class="q-px-sm top-btn" rounded icon="add" label="data" color="positive" @click="onNew()" />
 
-    <q-page-sticky position="top" :offset="[0, 5]">
-      <q-btn dense class="q-px-sm" rounded icon="add" label="data" color="positive" @click="onNew()" />
-    </q-page-sticky>
+    <!--  -->    
     
     <q-dialog v-model="formDialog">
-      <q-card>
+      <q-card style="min-width:40vw">
         <q-bar class="bg-primary text-white">
           <div class="text-h6">{{editID === null ? 'Tambah' : 'Ubah'}} {{title}}</div>
           <q-space />
@@ -92,13 +90,42 @@
                 </template>
               </q-input>
             </template>
+            <template v-else-if="input.type == 'resource'">
+              <q-select v-model="input.value" :options="input.options" map-options :label="input.label">
+                <template v-if="input.resource.component" v-slot:append>
+                  <q-btn round dense flat icon="add" @click="showResource(input,index)" />
+                </template>
+              </q-select>
+            </template>
           </div>
         </q-card-section>
         <q-card-actions>
-          <div class="row justify-end q-my-xs">
+          <div class="row justify-end q-my-xs full-width">
             <q-btn :loading="loading" :label="!editID ? 'Tambah Data' : 'Ubah Data'" color="positive" @click="onSubmit"/>
           </div>
         </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <!--  -->
+
+    <q-dialog v-model="resourceDialog" @hide="refreshResource">
+      <q-card style="min-width:75vw">
+        <q-bar class="bg-primary text-white">
+          <div class="text-h6">{{resource.title}}</div>
+
+          <q-space />
+
+          <q-btn dense flat icon="close" v-close-popup>
+            <q-tooltip>Close</q-tooltip>
+          </q-btn>
+        </q-bar>
+        
+        <q-card-section class="q-pa-none q-ma-none">
+          <div class="scroll q-pa-md" style="height:85vh">
+            <component :is="resource.component"></component>
+          </div>
+        </q-card-section>
       </q-card>
     </q-dialog>
 
@@ -112,7 +139,6 @@ export default {
     title: String,
     columns: Array,
     visibleColumns: Array,
-    resource: String,
     resourceURL: String,
     inputs: Array
   },
@@ -133,13 +159,14 @@ export default {
       nomor: 1,
       editID: null,
       formDialog: false,
-      defInps: []
+      defInps: [],
+      resourceDialog: false,
+      resource: {}
     }
   },
   computed: {
     loading: {
       get() { 
-        console.log('loading:',this.$store.state.loading )
         return this.$store.state.loading 
       },
       set(value) {
@@ -168,7 +195,26 @@ export default {
           }
         }).then((response) => {
           const body = response.data
-          console.log('body:',body)
+          if (body.status === "success") {
+            resolve(body.data)
+          } else {
+            reject(response)
+          }
+        }).catch((error) => {
+          reject(error)
+        }).finally(() => {
+          this.loading = false
+        })
+      })
+    },
+    fetchOption(url) {
+      return new Promise((resolve, reject) => {
+        this.$axios.get(url, {
+          headers: {
+            'Authorization' : 'Bearer ' + this.$store.getters.getToken,
+          }
+        }).then((response) => {
+          const body = response.data
           if (body.status === "success") {
             resolve(body.data)
           } else {
@@ -319,7 +365,11 @@ export default {
     onSubmit() {
       let inputs = {}
       this.inps.forEach((input) => {
-        inputs[input.name] = input.value
+        if (input.value != null && input.value != undefined) {
+          inputs[input.name] = input.value
+          if (input.type == 'resource')
+            inputs[input.name] = input.value.value
+        }
       })
       let afterSubmit = () => {
         this.resetForm()
@@ -332,25 +382,52 @@ export default {
         }).catch((error) => {
           console.log(error)
           this.$notifyNegative('Ada Sebuah Kesalahan')
-        }).finally(afterSubmit)
+        }).finally(afterSubmit())
       } else {
         this.postToServer(inputs).then((data) => {
           this.$notifyPositive('Data Berhasil Dimasukkan')
         }).catch((error) => {
           console.log(error)
           this.$notifyNegative('Ada Sebuah Kesalahan')
-        }).finally(afterSubmit)
+        }).finally(afterSubmit())
       }
     },
+    showResource(input,index) {
+      this.resource = {
+        title: input.label,
+        component: input.resource.component,
+        index: index
+      }
+      this.resourceDialog = true
+    },
+    fillResource(resource,index) {
+      this.fetchOption(resource.url)
+        .then((response) => {
+          let data = response.data
+          let options = data.map((v) => {
+            return {
+              label: v[resource.label],
+              value: v.id
+            }
+          })
+          this.$set(this.defInps[index], "options", options);
+          this.$set(this.inps[index], "options", options);
+        }).catch((error) => {
+          console.log(error)
+        })
+    },
+    refreshResource() {
+      let input = this.defInps[this.resource.index]
+      this.fillResource(input.resource,this.resource.index)
+    },
     resetForm() {
-      this.inps = this.inputs.map((inp) => {
+      this.inps = this.defInps.map((input) => {
         return {
-          ...inp,
-          label: inp.label ? inp.label : inp.name.toUpperCase(),
-          value: inp.default ? inp.default : ''
+          ...input,
+          value: input.default
         }
       })
-    }
+    },
   },
   created() {
     this.cols = this.columns.map((col) => {
@@ -374,14 +451,22 @@ export default {
       ...this.cols,
       {name: 'action', label: '', sortable: false}
     ]
-    this.resetForm()
   },
-  mounted () {
-    // get initial data from server (1st page)
-    this.onRequest({
-      pagination: this.pagination,
-      filter: undefined
+  mounted () {    
+    this.rerequest()
+
+    this.defInps = this.inputs.map((input,index) => {
+      if (input.type == 'resource') {
+        this.fillResource(input.resource,index)
+      }
+      return {
+        ...input,
+        label: input.label ? input.label : input.name.toUpperCase(),
+        value: input.default ? input.default : null
+      }
     })
+
+    this.resetForm()
   },
 }
 </script>
@@ -389,4 +474,9 @@ export default {
 <style lang="stylus">
 .text-grey-8 .material-icons
   color: white !important
+
+.top-btn
+  position: absolute
+  top: 2px
+  left: 40%
 </style>

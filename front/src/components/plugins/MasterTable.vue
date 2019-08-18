@@ -43,9 +43,12 @@
             <template v-else-if="col.name == 'no'">
               <q-avatar size="20px" class="q-ma-none q-pa-none text-anti-primary" color="primary">{{props.row.__index+nomor}}</q-avatar>
             </template>
-            <template v-else-if="col.type && col.type == 'boolean'">
+            <template v-else-if="col.type == 'boolean'">
               <q-avatar v-if="col.value" size="24px" class="text-white" color="positive" icon="check"></q-avatar>
               <q-avatar v-else size="24px" class="text-white" color="negative" icon="close"></q-avatar>
+            </template>
+            <template v-else-if="col.type == 'dialog'">
+              <q-btn color="info" :label="col.label" dense @click="showComponent(col,props.row)"/>
             </template>
             <template v-else>
               {{col.value}}
@@ -68,16 +71,23 @@
             <q-tooltip>Close</q-tooltip>
           </q-btn>
         </q-bar>
+        <form @submit.prevent="onSubmit">
         <q-card-section>
           <div v-for="(input,index) in inps" :key="index">
             <template v-if="input.type == 'text' || !input.type">
               <q-input :label="input.label" v-model="input.value" />
             </template>
+            <template v-else-if="input.type == 'textarea'">
+              <q-input autogrow :label="input.label" v-model="input.value" />
+            </template>
+            <template v-else-if="input.type == 'password'">
+              <q-input type="password" :label="input.label" v-model="input.value" />
+            </template>
             <template v-else-if="input.type == 'number'">
               <q-input type="number" :label="input.label" v-model.number="input.value" />
             </template>
             <template v-else-if="input.type == 'toggle'">
-              <q-toggle checked-icon="check" unchecked-icon="clear" :true-value="1" :false-value="0" v-model="input.value" color="primary" :label="input.label"/>
+              <q-toggle class="q-my-sm" checked-icon="check" unchecked-icon="clear" :true-value="1" :false-value="0" v-model="input.value" color="primary" :label="input.label"/>
             </template>
             <template v-else-if="input.type == 'date'">
               <q-input :label="input.label" v-model="input.value" mask="####/##/##" placeholder="YYYY/MM/DD">
@@ -90,6 +100,10 @@
                 </template>
               </q-input>
             </template>
+            <template v-else-if="input.type == 'select'">
+              <q-select v-model="input.value" :options="input.options" map-options :label="input.label">
+              </q-select>
+            </template>
             <template v-else-if="input.type == 'resource'">
               <q-select v-model="input.value" :options="input.options" map-options :label="input.label">
                 <template v-if="input.resource.component" v-slot:append>
@@ -101,9 +115,10 @@
         </q-card-section>
         <q-card-actions>
           <div class="row justify-end q-my-xs full-width">
-            <q-btn :loading="loading" :label="!editID ? 'Tambah Data' : 'Ubah Data'" color="positive" @click="onSubmit"/>
+            <q-btn type="submit" :loading="loading" :label="!editID ? 'Tambah Data' : 'Ubah Data'" color="positive"/>
           </div>
         </q-card-actions>
+        </form>
       </q-card>
     </q-dialog>
 
@@ -124,6 +139,28 @@
         <q-card-section class="q-pa-none q-ma-none">
           <div class="scroll q-pa-md" style="height:85vh">
             <component :is="resource.component"></component>
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!--  -->
+
+    <q-dialog v-model="componentDialog">
+      <q-card style="min-width:75vw">
+        <q-bar class="bg-primary text-white">
+          <div class="text-h6">{{component.title}}</div>
+
+          <q-space />
+
+          <q-btn dense flat icon="close" v-close-popup>
+            <q-tooltip>Close</q-tooltip>
+          </q-btn>
+        </q-bar>
+        
+        <q-card-section class="q-pa-none q-ma-none">
+          <div class="scroll q-pa-md">
+            <component :data="component.data" :is="component.component"></component>
           </div>
         </q-card-section>
       </q-card>
@@ -161,7 +198,9 @@ export default {
       formDialog: false,
       defInps: [],
       resourceDialog: false,
-      resource: {}
+      resource: {},
+      componentDialog: false,
+      component: {}
     }
   },
   computed: {
@@ -179,141 +218,11 @@ export default {
     },
   },
   methods: {
-    fetchFromServer(filter,paginate,page,sortBy,descending) {
-      this.loading = true
-      return new Promise((resolve, reject) => {
-        this.$axios.get(this.resourceURL, {
-          headers: {
-            'Authorization' : 'Bearer ' + this.$store.getters.getToken,
-          },
-          params: {
-            filter: filter,
-            paginate: paginate, 
-            page: page,
-            sortBy: sortBy,
-            descending: descending
-          }
-        }).then((response) => {
-          const body = response.data
-          if (body.status === "success") {
-            resolve(body.data)
-          } else {
-            reject(response)
-          }
-        }).catch((error) => {
-          reject(error)
-        }).finally(() => {
-          this.loading = false
-        })
-      })
-    },
-    fetchOption(url) {
-      return new Promise((resolve, reject) => {
-        this.$axios.get(url, {
-          headers: {
-            'Authorization' : 'Bearer ' + this.$store.getters.getToken,
-          }
-        }).then((response) => {
-          const body = response.data
-          if (body.status === "success") {
-            resolve(body.data)
-          } else {
-            reject(response)
-          }
-        }).catch((error) => {
-          reject(error)
-        }).finally(() => {
-          this.loading = false
-        })
-      })
-    },
-    fetchByID(id) {
-      this.loading = true
-      return new Promise((resolve, reject) => {
-        this.$axios.get(this.resourceURL + `/${id}`, {
-          headers: {
-            'Authorization' : 'Bearer ' + this.$store.getters.getToken,
-          }
-        }).then((response) => {
-          const body = response.data
-          if (body.status === "success") {
-            resolve(body.data)
-          } else {
-            reject(response)
-          }
-        }).catch((error) => {
-          reject(error)
-        }).finally(() => {
-          this.loading = false
-        })
-      })
-    },
-    deleteFromServer(id) {
-      this.loading = true
-      return new Promise((resolve, reject) => {
-        this.$axios.delete(this.resourceURL + `/${id}`, {
-          headers: {
-            'Authorization' : 'Bearer ' + this.$store.getters.getToken,
-          }
-        }).then((response) => {
-          const body = response.data
-          if (body.status === "success") {
-            resolve(body.data)
-          } else {
-            reject(response)
-          }
-        }).catch((error) => {
-          reject(error)
-        }).finally(() => {
-          this.loading = false
-        })
-      })
-    },
-    postToServer(inputs) {
-      this.loading = true
-      return new Promise((resolve, reject) => {
-        this.$axios.post(this.resourceURL, {
-          ...inputs,
-          token: this.$store.getters.getToken
-        }).then((response) => {
-          const body = response.data
-          if (body.status === "success") {
-            resolve(body.data)
-          } else {
-            reject(response)
-          }
-        }).catch((error) => {
-          reject(error)
-        }).finally(() => {
-          this.loading = false
-        })
-      })
-    },
-    updateToServer(id,inputs) {
-      this.loading = true
-      return new Promise((resolve, reject) => {
-        this.$axios.put(this.resourceURL + `/${id}`, {
-          ...inputs,
-          token: this.$store.getters.getToken
-        }).then((response) => {
-          const body = response.data
-          if (body.status === "success") {
-            resolve(body.data)
-          } else {
-            reject(response)
-          }
-        }).catch((error) => {
-          reject(error)
-        }).finally(() => {
-          this.loading = false
-        })
-      })
-    },
     onRequest (props) {
       let { page, rowsPerPage, rowsNumber, sortBy, descending } = props.pagination
       let filter = props.filter
 
-      this.fetchFromServer(filter, rowsPerPage, page, sortBy, descending)
+      this.$store.dispatch("fetchAll",{url: this.resourceURL, filter, rowsPerPage, page, sortBy, descending})
         .then((data) => {
           let tabledata = data.data
           this.data = tabledata.data
@@ -333,7 +242,8 @@ export default {
       })
     },
     onDelete(row) {
-      this.deleteFromServer(row.id).then((data) => {
+      this.$store.dispatch("deleteSingle",{url: this.resourceURL, id: row.id})
+      .then((data) => {
         this.$notifyPositive('Data Berhasil Dihapus')
       }).catch((error) => {
         console.log(error)
@@ -344,7 +254,7 @@ export default {
     },
     onEdit(row) {
       this.editID = row.id
-      this.fetchByID(row.id).then((data) => {
+      this.$store.dispatch("fetchSingle",{url: this.resourceURL, id: row.id}).then((data) => {
         this.inps = this.inps.map((input) => {
           return {
             ...input,
@@ -367,24 +277,28 @@ export default {
       this.inps.forEach((input) => {
         if (input.value != null && input.value != undefined) {
           inputs[input.name] = input.value
-          if (input.type == 'resource')
+          if (input.value.value && input.type == 'resource' || input.type == 'select')
             inputs[input.name] = input.value.value
         }
       })
       let afterSubmit = () => {
         this.resetForm()
         this.formDialog = false
-        this.rerequest()
+        setTimeout(() => {
+          this.rerequest()
+        }, 100)
       }
       if (this.editID) {
-        this.updateToServer(this.editID,inputs).then((data) => {
+        this.$store.dispatch("updateSingle",{url: this.resourceURL, id: this.editID, inputs})
+        .then((data) => {
           this.$notifyPositive('Data Berhasil Diubah')
         }).catch((error) => {
           console.log(error)
           this.$notifyNegative('Ada Sebuah Kesalahan')
         }).finally(afterSubmit())
       } else {
-        this.postToServer(inputs).then((data) => {
+        this.$store.dispatch("postSingle",{url: this.resourceURL, inputs})
+        .then((data) => {
           this.$notifyPositive('Data Berhasil Dimasukkan')
         }).catch((error) => {
           console.log(error)
@@ -400,8 +314,17 @@ export default {
       }
       this.resourceDialog = true
     },
+    showComponent(col,row) {
+      this.component = {
+        title: col.label,
+        component: col.component,
+        data: row
+      }
+      console.log(this.component)
+      this.componentDialog = true
+    },
     fillResource(resource,index) {
-      this.fetchOption(resource.url)
+      this.$store.dispatch("fetchOptions",{url: resource.url})
         .then((response) => {
           let data = response.data
           let options = data.map((v) => {

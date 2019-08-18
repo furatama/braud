@@ -40,6 +40,9 @@ export default function (/* { ssrContext } */) {
     },
 
     mutations: {
+      rename (state, {name}) {
+        state.auth.name = name
+      },
       applyAuth (state, payload) {
         console.log(payload)
         state.auth = {
@@ -112,10 +115,10 @@ export default function (/* { ssrContext } */) {
       //   })
       // },
       requestAuth ({dispatch,commit}, payload) {
-        console.log(payload)
+        // console.log(payload)
         commit('loadingStart')
         return new Promise((resolve, reject) => {
-          axios.post('/api/auth/login', {
+          axios.post('/auth/login', {
             username: payload.username,
             password: payload.password
           }).then((response) => {
@@ -136,10 +139,10 @@ export default function (/* { ssrContext } */) {
         })
       },
       validateToken ({getters,commit}, relog) {
-        console.log(relog, getters.getToken)
+        // console.log(relog, getters.getToken)
         commit('loadingStart')
         return new Promise((resolve, reject) => {
-          axios.post('/api/auth/me', {
+          axios.post('/auth/me', {
             token: getters.getToken,
           }).then((response) => {
             console.log(response)

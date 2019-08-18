@@ -1,49 +1,46 @@
 <template>
   <q-page padding>
-    <q-dialog v-model="formDialog">
-      <q-card style="min-width:40vw">
-        <q-bar class="bg-primary text-white">
-          <div class="text-h6">test</div>
-          <q-space />
-          <q-btn dense flat icon="close" v-close-popup>
-            <q-tooltip>Close</q-tooltip>
-          </q-btn>
-        </q-bar>
-        <q-card-section>
-          <div>
-            <q-input label="asdf"/>
-            <q-select v-model="input.value" :options="input.options" map-options :label="input.label">
-              <template v-slot:append>
-                <q-btn round dense flat icon="add"  />
-              </template>
-            </q-select>
-          </div>
-        </q-card-section>
-        <q-card-actions>
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <m-table  
+      title="Master Produk"
+      :columns="columns"
+      :resourceURL="resourceURL"
+      :inputs="inputs"
+    >
+    </m-table>
   </q-page>
 </template>
 
 <script>
+import MasterTable from '../components/plugins/MasterTable'
+
 export default {
-  // name: 'PageName',
+  name: 'MasterProduk',
+  components: {
+    'm-table' : MasterTable
+  },
   data() {
     return {
-      formDialog: false,
-      input: {
-        label: 'sarang',
-        value: 'gg',
-        options: [
-          {label: 'a',
-          value: 1}
-        ]
-      }
+      resourceURL: "/produk/data",
+      columns: [
+        { name: 'kode', label: 'Kode', type: 'string'},
+        { name: 'nama', label: 'Nama', type: 'string'},
+        { name: 'kategori', label: 'Kategori', type: 'string'},
+        { name: 'satuan', label: 'Satuan', type: 'string' },
+        { name: 'aktif', label: 'Aktif?', type: 'boolean' },
+      ],
+      inputs: [
+        { name: 'kode', label: 'Kode', type: 'text', required: true},
+        { name: 'nama', label: 'Nama', type: 'text', required: true},
+        { name: 'id_kategori', label: 'Kategori', type: 'resource', resource: {
+          url: '/kategori/data', component: () => import('../components/MasterCategory.vue'), label: 'nama',
+        }},
+        { name: 'id_satuan', label: 'Satuan', type: 'resource', resource: {
+          url: '/satuan/data', component: () => import('../components/MasterUnit.vue'), label: 'nama',
+        }},
+        { name: 'keterangan', label: 'Keterangan', type: 'textarea'},
+        { name: 'aktif', label: 'Aktif?', type: 'toggle', default: 1 },
+      ]
     }
-  },
-  mounted() {
-    this.formDialog = true
   }
 }
 </script>

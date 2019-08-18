@@ -1,7 +1,7 @@
 <template>
   <!-- Master Customer -->
   <m-table  
-    title="Master Unit"
+    title="Master Satuan"
     :columns="columns"
     :resourceURL="resourceURL"
     :inputs="inputs"
@@ -13,20 +13,20 @@
 import MasterTable from './plugins/MasterTable'
 
 export default {
-  name: 'MasterCustomer',
+  name: 'MasterSatuan',
   components: {
     'm-table' : MasterTable
   },
   data() {
     return {
-      resourceURL: "/api/unit",
+      resourceURL: "/api/satuan/data",
       columns: [
-        { name: 'nama', type: 'string'},
-        { name: 'keterangan', type: 'string' },
+        { name: 'nama', label: 'Nama', type: 'string'},
+        { name: 'keterangan', label: 'Keterangan', type: 'string' },
       ],
       inputs: [
-        { name: 'nama', type: 'text', required: true},
-        { name: 'keterangan', type: 'text', required: true},
+        { name: 'nama', label: 'Nama', type: 'text', required: true},
+        { name: 'keterangan', label: 'Keterangan', type: 'text'},
       ]
     }
   }

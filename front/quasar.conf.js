@@ -6,7 +6,7 @@ module.exports = function (ctx) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     boot: [
-      'axios','numeral','html-paper','notify','date'
+      'axios','numeral','html-paper','notify','date','helper'
     ],
 
     css: [
@@ -76,7 +76,7 @@ module.exports = function (ctx) {
       proxy: {
         // proxy all requests starting with /api to jsonplaceholder
         '/api': {
-          target: 'http://localhost/bdsm-laravel-boilerplate/public/api/',
+          target: 'http://localhost/braud/public/api/',
           changeOrigin: true,
           pathRewrite: {
             '^/api': ''

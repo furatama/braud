@@ -1,8 +1,7 @@
 <template>
   <q-page padding>
-    <!-- Master Customer -->
     <m-table  
-      title="Master Test"
+      title="Master Customer"
       :columns="columns"
       :resourceURL="resourceURL"
       :inputs="inputs"
@@ -21,22 +20,22 @@ export default {
   },
   data() {
     return {
-      resourceURL: "/api/test",
+      resourceURL: "/customer/data",
       columns: [
-        { name: 'int', type: 'integer'},
-        { name: 'str', type: 'string'},
-        { name: 'bool', type: 'boolean' },
-        { name: 'unit', type: 'string' },
-        { name: 'date', type: 'date'},
+        { name: 'nama', label: 'Nama', type: 'string'},
+        { name: 'alamat', label: 'Alamat', type: 'string'},
+        { name: 'telepon', label: 'Telepon', type: 'string'},
+        { name: 'email', label: 'Email', type: 'string'},
+        { name: 'aktif', label: 'Aktif?', type: 'boolean' },
+        { name: 'harga', label: 'Harga', type: 'dialog', component: () => import('../components/MasterHarga.vue') },
       ],
       inputs: [
-        { name: 'int', type: 'number', required: true},
-        { name: 'str', type: 'text', required: true},
-        { name: 'id_unit', type: 'resource', required: true, resource: {
-          url: '/api/unit', component: () => import('components/MasterUnit.vue'), label: 'nama',
-        }},
-        { name: 'bool', type: 'toggle', required: true, default: 1 },
-        { name: 'date', type: 'date', required: true},
+        { name: 'nama', label: 'Nama', type: 'text'},
+        { name: 'alamat', label: 'Alamat', type: 'text'},
+        { name: 'telepon', label: 'Telepon', type: 'text'},
+        { name: 'email', label: 'Email', type: 'text'},
+        { name: 'keterangan', label: 'Keterangan', type: 'textarea'},
+        { name: 'aktif', label: 'Aktif?', type: 'toggle', default: 1 },
       ]
     }
   }

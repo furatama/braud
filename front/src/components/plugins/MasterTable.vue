@@ -13,16 +13,29 @@
       :rows-per-page-options="rpp"
       class="bg-secondary text-anti-primary"
       table-class="no-scroll bg-accent text-primary"
+      hide-header
     >
       <template v-slot:top-right>
-        <div class="row justify-between">
+        <div class="row q-col-gutter-md">
           <slot name="header"></slot>
-          <q-input dark dense debounce="300" v-model="filter" placeholder="Search">
+          <q-input dark outlined dense debounce="300" v-model="filter" placeholder="Search">
             <template v-slot:append>
               <q-icon name="search" />
             </template>
           </q-input>
         </div>
+      </template>
+      <template v-slot:top-row="props">
+        <q-tr :props="props">
+          <q-td v-for="(col,index) in props.cols" :key="index">
+            <template v-if="col.type == 'string'">
+              <q-input debounce="300" v-model="col.filter" style="height:12px" input-style="padding:0px;font-size:12px" dense :placeholder="`${col.label}`"/>
+            </template>
+            <template v-else-if="col.type == 'boolean'">
+              <q-toggle checked-icon="check" unchecked-icon="clear" :true-value="1" :false-value="0" v-model="col.filter" color="primary" dense style="margin-left:-15px"/>
+            </template>
+          </q-td>
+        </q-tr>
       </template>
       <template v-slot:body="props">
         <q-tr :props="props">
@@ -200,7 +213,8 @@ export default {
       resourceDialog: false,
       resource: {},
       componentDialog: false,
-      component: {}
+      component: {},
+      singleFilter: {}
     }
   },
   computed: {
@@ -216,13 +230,32 @@ export default {
         }
       }
     },
+    colFilters() {
+      return this.cols
+    }
+  },
+  watch: {
+    colFilters: {
+      handler(val){
+        this.rerequest()
+      },
+      deep: true
+    }
   },
   methods: {
     onRequest (props) {
       let { page, rowsPerPage, rowsNumber, sortBy, descending } = props.pagination
       let filter = props.filter
+      let colFilter = {} 
+      let cols = props.cols || this.cols
+      cols.forEach((el) => {
+        if (el.type && el.type != 'dialog')
+          colFilter[el.name] = el.filter
+      })
 
-      this.$store.dispatch("fetchAll",{url: this.resourceURL, filter, rowsPerPage, page, sortBy, descending})
+      console.log(colFilter)
+
+      this.$store.dispatch("fetchAll",{url: this.resourceURL, filter, rowsPerPage, page, sortBy, descending, colFilter})
         .then((data) => {
           let tabledata = data.data
           this.data = tabledata.data
@@ -238,7 +271,8 @@ export default {
     rerequest() {
       this.onRequest({
         pagination: this.pagination,
-        filter: this.filter
+        filter: this.filter,
+        cols: this.cols
       })
     },
     onDelete(row) {
@@ -356,9 +390,10 @@ export default {
     this.cols = this.columns.map((col) => {
       return {
         ...col,
-        align: col.align ? col.align : (col.type == 'integer' || col.type == 'decimal' || col.type == 'date' ? 'right' : 'left'),
-        label: col.label ? col.label : col.name.toUpperCase(),
-        field: col.field ? col.field : col.name,
+        align: col.align || (col.type == 'integer' || col.type == 'decimal' || col.type == 'date' ? 'right' : 'left'),
+        label: col.label || col.name.toUpperCase(),
+        field: col.field || col.name,
+        filter: col.filter || (col.type == 'boolean' ? 1 : ''),
         format: (val, row) => {
           if (col.type === 'integer' || col.type === 'decimal') {
             return this.$numeralCurrency(val)
@@ -376,7 +411,7 @@ export default {
     ]
   },
   mounted () {    
-    this.rerequest()
+    // this.rerequest()
 
     this.defInps = this.inputs.map((input,index) => {
       if (input.type == 'resource') {

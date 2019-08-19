@@ -8,8 +8,8 @@
     <div class="row" style="height:auto">
       <div class="col-6 row q-col-gutter-md" v-for="(row,index) in listHarga" :key="index">
         <div class="q-mt-md"><q-avatar size="20px" class="q-ma-none q-pa-none text-anti-primary" color="primary">{{index+1}}</q-avatar></div>
-        <div><q-select map-options label="Nama Produk" v-model="row.produk" :options="produkOpts" style="min-width:150px"/></div>
-        <div><q-input type="number" label="Harga" v-model="row.harga"/></div>
+        <div><select-filter label="Nama Produk" v-model="row.produk" :options="produkOpts" style="width:225px"/></div>
+        <div><q-input type="number" label="Harga" v-model="row.harga" style="width:80px" input-class="text-right"/></div>
         <div class="q-mt-md">
           <q-btn flat dense icon="delete" color="negative" @click="removeHarga(index)"/>
         </div>
@@ -34,10 +34,15 @@
 </template>
 
 <script>
+import SelectFilter from './plugins/SelectFilter'
+
 export default {
   // name: 'ComponentName',
   props: {
     data: [Object,Array]
+  },
+  components: {
+    'select-filter' : SelectFilter
   },
   data () {
     return {
@@ -65,7 +70,7 @@ export default {
       this.listHarga.splice(index,1)
     },
     fillOptions(index) {
-      this.$store.dispatch("fetchOptions",{url: '/produk/data'})
+      this.$store.dispatch("fetchOptions",{url: '/produk/aktif'})
         .then((response) => {
           let data = response.data
           this.produkOpts = data.map((v) => {
@@ -111,7 +116,7 @@ export default {
           this.listHarga = data.map((v) => {
             return {
               produk: v.id_produk,
-              harga: v.harga,
+              harga: this.$numeralVal(v.harga),
             }
           })
         }).catch((error) => {
@@ -122,7 +127,6 @@ export default {
   },
   mounted() {
     setTimeout(() => {
-      console.log(this.data.id)
       this.fillOptions()
       this.loadHarga()
     }, 1)

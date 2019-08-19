@@ -57,3 +57,14 @@ if (! function_exists('tgl_indo')) {
   }
     
 }
+
+if (! function_exists('array_replace_element')) {
+  function array_replace_element($array,$old,$new){
+    for($i=0;$i<count($array);$i++) {
+      if($array[$i] == $old) {
+        $array[$i] = $new;
+      }
+    }
+    return $array;
+  }
+}

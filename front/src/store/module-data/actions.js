@@ -1,6 +1,6 @@
 import { axios } from 'boot/axios'
 
-export function fetchAll(context,{url,filter,rowsPerPage,page,sortBy,descending}) {
+export function fetchAll(context,{url,filter,rowsPerPage,page,sortBy,descending,colFilter}) {
   return new Promise((resolve, reject) => {
     context.commit("loadingStart")
     axios.get(url, {
@@ -12,7 +12,8 @@ export function fetchAll(context,{url,filter,rowsPerPage,page,sortBy,descending}
         paginate: rowsPerPage, 
         page: page,
         sortBy: sortBy,
-        descending: descending
+        descending: descending,
+        colFilter: colFilter
       }
     }).then((response) => {
       const body = response.data

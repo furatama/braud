@@ -18,7 +18,7 @@ export default async ({ Vue }) => {
   });
 
   // switch between locales
-  numeral.locale('id');
+  // numeral.locale('id');
 
   Vue.prototype.$numeral = numeral
   Vue.prototype.$numeralVal = (val) => {return numeral(val).value()}

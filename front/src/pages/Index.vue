@@ -1,6 +1,9 @@
 <template>
   <q-page class="flex flex-center">
-    DASHBOARD
+    <img
+      src="~assets/logo.jpg"
+      style="width:40vw;"
+    >
   </q-page>
 </template>
 

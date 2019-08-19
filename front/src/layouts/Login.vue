@@ -37,7 +37,8 @@ export default {
   },
   methods: {
     error(msg) {
-      this.$notifyNegative(`Login Gagal [${msg}]`)
+      console.log(msg)
+      this.$notifyNegative(`Login Gagal [Username/Password Salah]`)
     },
     success(data) {
       this.$notifyPositive(`Login Berhasil`)

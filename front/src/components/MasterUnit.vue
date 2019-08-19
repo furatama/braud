@@ -19,7 +19,7 @@ export default {
   },
   data() {
     return {
-      resourceURL: "/api/satuan/data",
+      resourceURL: "/satuan/data",
       columns: [
         { name: 'nama', label: 'Nama', type: 'string'},
         { name: 'keterangan', label: 'Keterangan', type: 'string' },

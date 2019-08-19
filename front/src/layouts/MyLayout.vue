@@ -130,7 +130,7 @@ export default {
   created() {
     this.links = [
       {
-        label: 'Dashboard',
+        label: 'Index',
         to: '/home',
         icon: 'home',
       },

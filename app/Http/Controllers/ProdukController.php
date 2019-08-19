@@ -16,15 +16,25 @@ class ProdukController extends Controller
         $satuanData = Satuan::select('id as id_satuan','nama as satuan');
 
         $data = $produkData
-            ->joinModel($kategoriData, 'kategori' , 'produk.id_kategori' , 'kategori.id_kategori')
-            ->joinModel($satuanData, 'satuan' , 'produk.id_satuan' , 'satuan.id_satuan');
+            ->leftJoinModel($kategoriData, 'kategori' , 'produk.id_kategori' , 'kategori.id_kategori')
+            ->leftJoinModel($satuanData, 'satuan' , 'produk.id_satuan' , 'satuan.id_satuan');
 
         $produkTableData = (new Produk)->getTableProperties();
         $kategoriTableData = (new Kategori)->getTableProperties();
         $satuanTableData = (new Satuan)->getTableProperties();
+
+        $kategoriTableData['fields'] = ["kategori"];
+        $satuanTableData['fields'] = ["satuan"];
         
         $data = $data->searchAllFields($produkTableData,$kategoriTableData,$satuanTableData);
+        // dd($data->toSql());
 
+        return bd_json($data);
+    }
+
+    public function indexAktif()
+    {        
+        $data = Produk::where('aktif',1)->orderBy('nama')->get();
         return bd_json($data);
     }
 

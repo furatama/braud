@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Produk;
 use App\Kategori;
 use App\Satuan;
+use App\Harga;
 
 class ProdukController extends Controller
 {
@@ -18,16 +19,8 @@ class ProdukController extends Controller
         $data = $produkData
             ->leftJoinModel($kategoriData, 'kategori' , 'produk.id_kategori' , 'kategori.id_kategori')
             ->leftJoinModel($satuanData, 'satuan' , 'produk.id_satuan' , 'satuan.id_satuan');
-
-        $produkTableData = (new Produk)->getTableProperties();
-        $kategoriTableData = (new Kategori)->getTableProperties();
-        $satuanTableData = (new Satuan)->getTableProperties();
-
-        $kategoriTableData['fields'] = ["kategori"];
-        $satuanTableData['fields'] = ["satuan"];
         
-        $data = $data->searchAllFields($produkTableData,$kategoriTableData,$satuanTableData);
-        // dd($data->toSql());
+        $data = $data->searchAllFields();
 
         return bd_json($data);
     }
@@ -62,6 +55,14 @@ class ProdukController extends Controller
         if ($data) {
             $data->delete();
         }
+        return bd_json($data);
+    }
+
+    public function byCustomer($id_customer)
+    {        
+        $harga = Harga::where('id_customer', $id_customer)->select('harga','id_produk');
+        $data = Produk::where('aktif',1)->select('*')->joinModel($harga,'harga', 'produk.id', 'harga.id_produk')->orderBy('nama')->get();
+
         return bd_json($data);
     }
 

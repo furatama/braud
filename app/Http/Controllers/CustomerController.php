@@ -16,6 +16,12 @@ class CustomerController extends Controller
         return bd_json($data);
     }
 
+    public function indexAktif()
+    {        
+        $data = Customer::where('aktif',1)->orderBy('nama')->get();
+        return bd_json($data);
+    }
+
     public function store(Request $request)
     {
         $data = (new Customer)->record($request);      

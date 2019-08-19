@@ -160,7 +160,7 @@
     <!--  -->
 
     <q-dialog v-model="componentDialog">
-      <q-card style="min-width:75vw">
+      <q-card style="width:80vw;max-width:100vw">
         <q-bar class="bg-primary text-white">
           <div class="text-h6">{{component.title}}</div>
 
@@ -172,9 +172,9 @@
         </q-bar>
         
         <q-card-section class="q-pa-none q-ma-none">
-          <div class="scroll q-pa-md">
-            <component :data="component.data" :is="component.component"></component>
-          </div>
+          <q-scroll-area style="height:85vh" class="q-px-md">
+            <component class="q-pa-md" :data="component.data" :is="component.component"></component>
+          </q-scroll-area>
         </q-card-section>
       </q-card>
     </q-dialog>

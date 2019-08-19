@@ -37,6 +37,7 @@ Route::group(['middleware' => ['jwt.verify:admin']], function() {
 Route::group(['middleware' => ['jwt.verify']], function() { 
 
     Route::get('customer/data', 'CustomerController@index');
+    Route::get('customer/aktif', 'CustomerController@indexAktif');
     Route::post('customer/data', 'CustomerController@store');
     Route::get('customer/data/{id}', 'CustomerController@show');
     Route::put('customer/data/{id}', 'CustomerController@update');
@@ -46,13 +47,15 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::post('customer/{id}/harga', 'CustomerController@storeHarga');
 
     Route::get('produk/data', 'ProdukController@index');
-    Route::get('produk/aktif', 'ProdukController@indexAktif');
     Route::post('produk/data', 'ProdukController@store');
     Route::get('produk/data/{id}', 'ProdukController@show');
     Route::put('produk/data/{id}', 'ProdukController@update');
     Route::delete('produk/data/{id}', 'ProdukController@destroy');
     Route::get('produk/detail', 'ProdukController@indexWithDetail');
-    Route::get('produk/detail/{id}', 'ProdukController@showWithDetail')->where('id', '[0-9]+');
+    Route::get('produk/detail/{id}', 'ProdukController@showWithDetail');
+
+    Route::get('produk/aktif', 'ProdukController@indexAktif');
+    Route::get('produk/customer/{id_customer}', 'ProdukController@byCustomer');
 
     Route::get('harga/data', 'HargaController@index');
     Route::post('harga/data', 'HargaController@store');

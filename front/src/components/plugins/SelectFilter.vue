@@ -2,6 +2,7 @@
   <q-select 
     v-model="model" 
     :dense="dense" 
+    :outlined="outlined"
     :options="filteredOptions"
     :label="label"
     map-options
@@ -31,6 +32,7 @@ export default {
     dense: Boolean,
     label: String,
     urlAPI: String,
+    outlined: Boolean,
     options: Array,
     value: [Number,String,Object]
   },

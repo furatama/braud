@@ -84,6 +84,8 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('order/detail/{id}', 'OrderController@showWithDetail');
     Route::get('order/kredit', 'OrderController@indexCredit');
 
+    Route::get('order/num', 'OrderController@numOrder');
+
     Route::get('kredit/data', 'KreditController@index');
     Route::post('kredit/data', 'KreditController@store');
     Route::get('kredit/data/{id}', 'KreditController@show');

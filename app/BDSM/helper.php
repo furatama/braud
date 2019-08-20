@@ -4,9 +4,9 @@ if (! function_exists('bd_json')) {
   function bd_json($data, $additionalData = []) {
     $json = [];
     $paginate = request('paginate');
-    if ($data != null) {
+    if ($data !== null) {
       if (is_array($data)) {
-        return jsend_success($json);
+        return jsend_success($data);
       }
       if (get_class($data) === "Illuminate\\Database\\Eloquent\\Builder") {
         if ($paginate != null && is_numeric($paginate)) {

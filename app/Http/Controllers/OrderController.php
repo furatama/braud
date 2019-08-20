@@ -64,4 +64,10 @@ class OrderController extends Controller
         return bd_json($data);
     }
 
+    public function numOrder(Request $request) {
+        $date = $request->tanggal;
+        $data = Order::whereDate('tanggal',$date)->count();
+        return bd_json(["count" => $data]);
+    }
+
 }

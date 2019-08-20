@@ -27,4 +27,9 @@ export default async ({Vue}) => {
 
     return result;
   }
+
+  Vue.prototype.$array_filter = (arr, val, label = "label") => {
+    const needle = val.toLowerCase()
+    return arr.filter(v => v[label].toLowerCase().indexOf(needle) > -1)
+  }
 }

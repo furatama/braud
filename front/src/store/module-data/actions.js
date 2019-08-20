@@ -1,5 +1,30 @@
 import { axios } from 'boot/axios'
 
+export function fetch(context,{url,params}) {
+  return new Promise((resolve, reject) => {
+    context.commit("loadingStart")
+    axios.get(url, {
+      headers: {
+        'Authorization' : 'Bearer ' + context.getters.getToken,
+      },
+      params
+    }).then((response) => {
+      const body = response.data
+      if (body.status === "success") {
+        resolve(body.data)
+      } else if (body.status === "fail") {
+        resolve(body.data)
+      } else {
+        reject(response)
+      }
+    }).catch((error) => {
+      reject(error)
+    }).finally(() => {
+      context.commit("loadingEnd")
+    })
+  })
+}
+
 export function fetchAll(context,{url,filter,rowsPerPage,page,sortBy,descending,colFilter}) {
   return new Promise((resolve, reject) => {
     context.commit("loadingStart")

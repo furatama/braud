@@ -3,7 +3,7 @@
     <div class="row q-col-gutter-sm">
       <div class="col-9">
         <div class="row q-gutter-sm">
-          <q-input v-model="order.no" outlined label="No Order"/>
+          <q-input v-model="order.no" readonly outlined label="No Order"/>
           <q-input v-model="order.tanggal" outlined label="Tanggal Order" mask="####/##/##" placeholder="YYYY/MM/DD">
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
@@ -138,7 +138,7 @@
             bordered 
             icon="print"
             :disable="(exchange < 0 && payment.method == 'cash') || (exchange > 0 && payment.method == 'credit')" 
-            @click="() => {submitSales(); printSales();}"
+            @click="() => {submitOrder(); printOrder();}"
           >
           </q-btn>
           
@@ -148,16 +148,26 @@
     <!-- <div class="absolute-bottom full-width bg-accent shadow-3">
       asdf
     </div> -->
+    <print-out 
+      ref="printer" 
+    />
+      <!-- :data="table.data" 
+      :total="table.grandTotal" 
+      :cash="paidAmount" 
+      :exchange="exchange" 
+      :date="$date.formatDate(Date.now(), 'DD.MM.YY-HH:mm')" -->
   </q-page>
 </template>
 
 <script>
 import SelectFilter from '../components/plugins/SelectFilter'
+import PrintOut from '../components/OrderPrintOut'
 
 export default {
   // name: 'PageName',
   components: {
-    'select-filter' : SelectFilter
+    'select-filter' : SelectFilter,
+    'print-out' : PrintOut,
   },
   data() {
     return {
@@ -183,6 +193,7 @@ export default {
         grandTotal: 0
       },
       produkData: [],
+      defProdukData: [],
       filter: '',
       checkout: {
         isShow: false,
@@ -202,6 +213,12 @@ export default {
       this.table.data = []
       return this.order.customer
     },
+    orderDate() {
+      return this.order.tanggal
+    },
+    payMethod() {
+      return this.payment.method
+    },
     exchange() {
       const total = this.table.grandTotal
       const paid = this.payment.paid
@@ -211,6 +228,15 @@ export default {
   watch: {
     customerData() {
       this.loadProduk()
+    },
+    orderDate() {
+      this.loadNoOrder()
+    },
+    payMethod() {
+      this.loadNoOrder()
+    },
+    filter() {
+      this.produkData = this.$array_filter(this.defProdukData,this.filter,'nama')
     }
   },
   methods: {
@@ -229,11 +255,26 @@ export default {
           this.$notifyNegative("Gagal Mengambil Data Customer")
         })
     },
+    loadNoOrder() {
+      this.$store.dispatch("fetch",{url: `/order/num`, params: {tanggal: this.order.tanggal}})
+        .then((data) => {
+          let n = (Number(data.count) + 1)
+          n = n > 99 ? n.toString(36) : n.toString()
+          let tk = this.payment.method == 'cash' ? 'T' : 'K'
+          this.order.no = "BA" + this.$date.formatDate(this.order.tanggal,"YYMMDD") + n.padStart(2,'0') + tk
+        }).catch((error) => {
+          console.log(error)
+          this.$notifyNegative("Gagal Mengambil Data No Order")
+        })
+    },
     loadProduk() {
       this.$store.dispatch("fetchOptions",{url: `/produk/customer/${this.customerData.value}`})
         .then((response) => {
           let data = response.data
-          this.produkData = data
+          this.defProdukData = data
+          if (this.filter !== '')
+            this.filter = ''
+          this.produkData = this.$array_filter(this.defProdukData,this.filter,'nama')
         }).catch((error) => {
           console.log(error)
           this.$notifyNegative("Gagal Mengambil Data Produk")
@@ -284,9 +325,16 @@ export default {
       else
         this.payment.paid += Number(amount)
     },
+    submitOrder() {
+
+    },
+    printOrder() {
+      this.$refs.printer.print()
+    }
   },
   mounted() {
     this.loadCustomer()
+    this.loadNoOrder()
   }
 }
 </script>

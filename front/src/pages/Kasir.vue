@@ -150,6 +150,7 @@
     </div> -->
     <print-out 
       ref="printer" 
+      :data="printData"
     />
       <!-- :data="table.data" 
       :total="table.grandTotal" 
@@ -223,6 +224,26 @@ export default {
       const total = this.table.grandTotal
       const paid = this.payment.paid
       return paid - total
+    },
+    printData() {
+      return {
+        no: this.order.no,
+        tanggal: this.$date.formatDate(this.order.tanggal, 'DD/MMMM/YYYY'),
+        kasir: this.$store.getters.getName,
+        method: this.payment.method == 'cash' ? "TUNAI" : "KREDIT",
+        cust: {
+          nama: this.customerData.label,
+          email: this.customerData.email,
+          alamat: this.customerData.alamat,
+          telepon: this.customerData.telepon,
+        },
+        total: this.$numeralCurrency(this.table.grandTotal),
+        tunaiLabel: this.payment.method == 'cash' ? "Terbayar" : "Kredit",
+        tunai: this.$numeralCurrency(this.payment.paid),
+        sisaLabel: this.payment.method == 'cash' ? "Kembalian" : "Hutang",
+        sisa: this.payment.method == 'cash' ? this.$numeralCurrency(this.exchange) : this.$numeralCurrency(-this.exchange),
+        data: this.table.data
+      }
     }
   },
   watch: {
@@ -247,7 +268,10 @@ export default {
           this.order.customerOpts = data.map((v) => {
             return {
               label: v.nama,
-              value: v.id
+              value: v.id,
+              alamat: v.alamat || '',
+              telepon: v.email || '',
+              email: v.email || '',
             }
           })
         }).catch((error) => {
@@ -326,7 +350,44 @@ export default {
         this.payment.paid += Number(amount)
     },
     submitOrder() {
-
+      let inputs = {
+        no: this.order.no,
+        id_customer: this.customerData.value,
+        metode: this.payment.method,
+        tanggal: this.orderDate,
+        faktur: '',
+        tunai: this.payment.paid,
+        keterangan: '',
+        detail: this.table.data.map((v) => {
+          return {
+            id_produk: v.id,
+            harga: v.hargaN,
+            qty: v.qty,
+            diskon: v.diskon
+          }
+        })
+      }
+      this.$store.dispatch("postSingle",{url: `/order/data`,inputs})
+        .then((response) => {
+          this.resetForm()
+          this.$notifyPositive("Berhasil Memasukkan Order")
+        }).catch((error) => {
+          console.log(error)
+          this.$notifyNegative("Gagal Memasukkan Order")
+        })
+    },
+    resetForm() {
+      this.loadNoOrder()
+      this.order.tanggal = this.$date.formatDate(Date.now(),'YYYY/MM/DD')
+      this.order.customer = ''
+      this.table.data = []
+      this.refreshGrandTotal()
+      this.defProdukData = []
+      this.produkData = []
+      this.filter = ''
+      this.payment.paid = 0
+      this.payment.method = 'cash'
+      this.checkout.isShow = false
     },
     printOrder() {
       this.$refs.printer.print()

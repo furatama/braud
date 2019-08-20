@@ -14,11 +14,11 @@
           <div style="height:2px"/>
         </td>
         <td style="vertical-align: bottom;"  >
-          <span style="border-bottom: 1px solid;">NO: xxxxxxx</span>
+          <span style="border-bottom: 1px solid;">NO: {{data.no}}</span>
           <div style="height:2px"/>
         </td>
         <td style="vertical-align: bottom; width:15%; text-align:right">
-          TUNAI
+          {{data.method}}
           <div style="height:2px"/>
         </td>
       </tr>
@@ -37,12 +37,15 @@
           <div style="
             font-weight:bold;
             font-size: 14px;
-          ">Cust: Customer</div>
-          <div>Alamat: </div>
+          ">Cust: {{data.cust.nama}}</div>
+          <div>{{data.cust.alamat || '-'}}</div>
+          <div style="
+            font-size: 10px;
+          ">{{data.cust.telepon || '-'}} / {{data.cust.email || '-'}}</div>
         </td>
         <td style="vertical-align: top; text-align:right">
-          <div>Tgl: 19-10-2012</div>
-          <div>Kasir: kasir</div>
+          <div>{{data.tanggal}}</div>
+          <div>Kasir: {{data.kasir}}</div>
         </td>
       </tr>
     </table>
@@ -77,13 +80,13 @@
           Subtotal
         </td>
       </tr>
-      <tr v-for="n in 5">
-        <td style="padding:0 3px;margin:0;height:12px;border-left: 1px solid;border-right: 1px solid;vertical-align:top">{{n}}</td>
-        <td style="padding:0 3px;margin:0;height:12px;border-left: 1px solid;border-right: 1px solid;vertical-align:top">Bun Chocolate 200g</td>
-        <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px solid;border-right: 1px solid;vertical-align:top">2000</td>
-        <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px solid;border-right: 1px solid;vertical-align:top">1</td>
-        <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px solid;border-right: 1px solid;vertical-align:top">20%</td>
-        <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px solid;border-right: 1px solid;vertical-align:top">1800</td>
+      <tr v-for="(item,n) in data.data">
+        <td style="padding:0 3px;margin:0;height:12px;border-left: 1px solid;border-right: 1px solid;vertical-align:top">{{n+1}}</td>
+        <td style="padding:0 3px;margin:0;height:12px;border-left: 1px solid;border-right: 1px solid;vertical-align:top">{{item.produk}}</td>
+        <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px solid;border-right: 1px solid;vertical-align:top">{{item.harga}}</td>
+        <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px solid;border-right: 1px solid;vertical-align:top">{{item.qty}}</td>
+        <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px solid;border-right: 1px solid;vertical-align:top">{{item.diskon}}%</td>
+        <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px solid;border-right: 1px solid;vertical-align:top">{{item.subtotal}}</td>
       </tr>
     </table>
     <div align="right" style="
@@ -94,13 +97,13 @@
     ">
       <div style="display:flex;justify-content: flex-end;">
         <div style="width:15%;margin-right:5px">Total : </div>
-        <div style="width:15%;margin-right:5px">80000</div>
+        <div style="width:15%;margin-right:5px">{{data.total}}</div>
       </div><div style="display:flex;justify-content: flex-end;">
-        <div style="width:15%;margin-right:5px">Terbayar : </div>
-        <div style="width:15%;margin-right:5px">80000</div>
+        <div style="width:15%;margin-right:5px">{{data.tunaiLabel}} : </div>
+        <div style="width:15%;margin-right:5px">{{data.tunai}}</div>
       </div><div style="display:flex;justify-content: flex-end;">
-        <div style="width:15%;margin-right:5px">Kembali : </div>
-        <div style="width:15%;margin-right:5px">80000</div>
+        <div style="width:15%;margin-right:5px">{{data.sisaLabel}} : </div>
+        <div style="width:15%;margin-right:5px">{{data.sisa}}</div>
       </div>
     </div>
     <div style="
@@ -122,42 +125,6 @@
         </div>
       </div>
     </div>
-
-    <!-- <div style="
-      font-family: 'Draft 17cpi', 'Consolas', Courier, monospace
-      font-size:12px;
-    ">
-      <div style="display:flex;justify-content:space-between">
-        <span>TOKO XXX</span>
-        <span>{{date}}</span>
-      </div>
-      <hr style="padding:0;margin:0">
-      <hr style="padding:0;margin:0">
-      <div v-for="(value,index) in data" :key="index" style="display:flex">
-        <div style="width:35%">{{value.item}}</div>
-        <div style="width:15%;text-align:right">{{value.qty}}</div>
-        <div style="width:25%;text-align:right">{{value.price}}</div>
-        <div style="width:25%;text-align:right">{{value.subtotal}}</div>
-      </div>
-      <div style="display:flex;justify-content:flex-end">
-        <div style="width:50%">
-          <hr style="padding:0;margin:0">
-          <hr style="padding:0;margin:0">
-          <div style="display:flex;">
-            <div style="width:50%">Total</div>
-            <div style="width:50%;text-align:right">{{total}}</div>          
-          </div>
-          <div style="display:flex;">
-            <div style="width:50%">Tunai</div>
-            <div style="width:50%;text-align:right">{{cash}}</div>
-          </div>
-          <div style="display:flex;">
-            <div style="width:50%">Kembali</div>
-            <div style="width:50%;text-align:right">{{exchange}}</div>
-          </div>
-        </div>
-      </div>
-    </div> -->
   </div>
 </template>
 
@@ -165,11 +132,7 @@
 export default {
   // name: 'ComponentName',
   props: {
-    data: Array,
-    cash: [String,Number],
-    total: [String,Number],
-    exchange: [String,Number],
-    date: [String,Number]
+    data: Object
   },
   data() {
     return {

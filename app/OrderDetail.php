@@ -14,5 +14,7 @@ class OrderDetail extends Model
 
     protected $hidden = ['deleted_at'];
 
-    protected $fillable = ['id_order','id_produk','harga','qyt','diskon'];
+    protected $fillable = ['id_order','id_produk','harga','qty','diskon'];
+
+    public $timestamps = false;
 }

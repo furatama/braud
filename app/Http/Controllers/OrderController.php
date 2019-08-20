@@ -17,6 +17,7 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
+        $request->request->add(["id_user" => auth()->user()->id]);
         $data = (new Order)->record($request); 
         $data = $data->recordDetail($request->detail);     
         return bd_json($data);

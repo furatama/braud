@@ -9,9 +9,9 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $data = Order::select('*');
-        $tableData = (new Order)->getTableProperties();
-        $data = $data->searchAllFields($tableData);
+        $data = Order::listing();
+        $data = $data->searchAllFields();
+        // dd($data->toSql());
         return bd_json($data);
     }
 

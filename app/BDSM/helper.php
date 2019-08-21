@@ -8,7 +8,7 @@ if (! function_exists('bd_json')) {
       if (is_array($data)) {
         return jsend_success($data);
       }
-      if (get_class($data) === "Illuminate\\Database\\Eloquent\\Builder") {
+      if (get_class($data) === "Illuminate\\Database\\Eloquent\\Builder" || get_class($data) === "Illuminate\\Database\\Query\\Builder") {
         if ($paginate != null && is_numeric($paginate)) {
           $data = $data->paginate($paginate);
         } else {

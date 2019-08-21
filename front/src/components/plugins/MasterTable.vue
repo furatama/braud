@@ -61,7 +61,7 @@
               <q-avatar v-else size="24px" class="text-white" color="negative" icon="close"></q-avatar>
             </template>
             <template v-else-if="col.type == 'dialog'">
-              <q-btn color="info" :label="col.label" dense @click="showComponent(col,props.row)"/>
+              <q-btn color="primary" :label="col.label" dense @click="showComponent(col,props.row)"/>
             </template>
             <template v-else>
               {{col.value}}
@@ -197,8 +197,6 @@ export default {
       filter: '',
       rpp: [3,7,15,50],
       pagination: {
-        sortBy: 'name',
-        descending: false,
         page: 1,
         rowsPerPage: 7,
         rowsNumber: 10,

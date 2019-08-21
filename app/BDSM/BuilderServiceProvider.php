@@ -47,7 +47,7 @@ class BuilderServiceProvider extends ServiceProvider
                     if ($val !== '')
                         $query = $query->where($key,'LIKE', '%' . $val . '%');
                 }
-                return $query->select('*');
+                return $query;
             }
             return $query->select('*');
         });

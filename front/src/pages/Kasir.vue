@@ -64,8 +64,9 @@
           </template>
         </q-table>
 
-        <div class="row q-mt-sm justify-end">
-          <q-btn label="CHECKOUT" color="positive" icon="local_grocery_store" @click="() => {checkout.isShow = true}"/>
+        <div class="row q-mt-sm justify-between">
+          <q-btn :disabled="table.data.length <= 0" label="RESET" color="info" icon="refresh" @click="() => {resetForm()}"/>
+          <q-btn :disabled="table.data.length <= 0" label="CHECKOUT" color="positive" icon="local_grocery_store" @click="() => {checkout.isShow = true}"/>
         </div>
 
       </div>

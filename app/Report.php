@@ -85,5 +85,36 @@ class Report extends Model
         // dd($result->get()->toArray());
         return $result;
     }
+
+    public static function order($method,$from,$to) {
+        $order = Order::query();
+        $detail = OrderDetail::select('id_order','id_produk','qty','diskon','harga');
+
+        $result = $order->joinModel($detail,'od','od.id_order','order.id');
+
+        if ($method === 'y') {
+            $result = $result->groupBy('date')->orderBy('date');
+            $tanggal = "CONCAT(YEAR(tanggal),'-01-01')";
+        } else if ($method === 'm') {
+            $result = $result->groupBy('date')->orderBy('date');
+            $tanggal = "CONCAT(DATE_FORMAT(tanggal, '%Y-%m'),'-01')";
+        } else if ($method === 'd' || $method === 'a') {
+            $result = $result->groupBy('date')->orderBy('date');
+            $tanggal = "order.tanggal";
+        }
+
+        $result = $result->select(DB::raw($tanggal . ' as date'),
+                    DB::raw('COUNT(DISTINCT id_order) as norder'),DB::raw('SUM(qty) as nproduk'),
+                    DB::raw('SUM((100-diskon)/100*qty*harga) as total')
+                );
+        
+        // $result = $order->joinModel($result,'ro','od.id_order','order.id');
+        
+        if ($from != null) $result = $result->whereDate('tanggal','>=',$from);
+        if ($to != null) $result = $result->whereDate('tanggal','<=',$to);
+
+        // dd($result->get()->toArray());
+        return $result;
+    }
 }
 

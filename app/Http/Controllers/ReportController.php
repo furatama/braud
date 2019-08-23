@@ -22,4 +22,12 @@ class ReportController extends Controller
         $data = Report::produk($method,$from,$to);
         return bd_json(Report::envelop($data));
     }
+
+    public function order(Request $request) {
+        $method = $request->input('method','d');
+        $from = $request->input('from',null);
+        $to = $request->input('to',null);
+        $data = Report::order($method,$from,$to);
+        return bd_json(Report::envelop($data));
+    }
 }

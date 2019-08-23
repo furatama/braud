@@ -1,12 +1,31 @@
 <template>
   <q-page padding>
-    Report Order
+    <report-table 
+      title="Report Order"
+      :columns="columns"
+      :resourceURL="link"
+    />
   </q-page>
 </template>
 
 <script>
+import ReportTable from '../components/plugins/ReportTable'
+
 export default {
-  // name: 'PageName',
+  components: {
+    'report-table' : ReportTable
+  },
+  data() {
+    return {
+      link: 'report/order',
+      columns: [
+        { name: 'date', label: 'Tanggal', type: 'date'},
+        { name: 'norder', label: 'Jumlah Order', type: 'integer'},
+        { name: 'nproduk', label: 'Jumlah Produk', type: 'integer'},
+        { name: 'total', label: 'Nominal', type: 'decimal'},
+      ],
+    }
+  },
 }
 </script>
 

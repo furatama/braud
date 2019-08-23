@@ -25,6 +25,37 @@ export function fetch(context,{url,params}) {
   })
 }
 
+export function fetchPaginate(context,{url,pagination,params}) {
+  return new Promise((resolve, reject) => {
+    context.commit("loadingStart")
+    axios.get(url, {
+      headers: {
+        'Authorization' : 'Bearer ' + context.getters.getToken,
+      },
+      params : {
+        paginate: pagination.rowsPerPage, 
+        page: pagination.page,
+        sortBy: pagination.sortBy,
+        descending: pagination.descending,
+        ...params
+      }
+    }).then((response) => {
+      const body = response.data
+      if (body.status === "success") {
+        resolve(body.data)
+      } else if (body.status === "fail") {
+        resolve(body.data)
+      } else {
+        reject(response)
+      }
+    }).catch((error) => {
+      reject(error)
+    }).finally(() => {
+      context.commit("loadingEnd")
+    })
+  })
+}
+
 export function fetchAll(context,{url,filter,rowsPerPage,page,sortBy,descending,colFilter}) {
   return new Promise((resolve, reject) => {
     context.commit("loadingStart")

@@ -96,4 +96,8 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
     Route::get('kredit/order/{id_order}', 'KreditController@showByIDOrder');
 
+    Route::get('report/customer','ReportController@customer');
+    Route::get('report/produk','ReportController@produk');
+    Route::get('report/order','ReportController@order');
+
 });

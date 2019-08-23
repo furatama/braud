@@ -87,8 +87,8 @@
             </q-item>
 
             <q-scroll-area style="height:75vh">
-              <q-item  v-for="(data,index) in produkData" clickable v-ripple :key="index">
-                <q-item-section @click="selectSearchedItem(data)">
+              <q-item  v-for="(data,index) in produkData" clickable v-ripple :key="index" @click="selectSearchedItem(data)">
+                <q-item-section>
                   <q-item-label>{{data.nama}}</q-item-label>
                   <q-item-label caption>{{data.kode}}</q-item-label>
                 </q-item-section>

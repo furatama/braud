@@ -174,12 +174,6 @@ export default {
         paid: 0,
         dialog: false
       },
-      order: {
-        no: '',
-        tanggal: this.$date.formatDate(Date.now(),'YYYY/MM/DD'),
-        customer: '',
-        customerOpts: [],
-      },
       table: {
         columns: [
           { name: 'produk', align: 'left', label: 'PRODUK', field: 'produk', sortable: false },

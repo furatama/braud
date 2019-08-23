@@ -13,7 +13,7 @@
       :rows-per-page-options="rpp"
       class="bg-secondary text-anti-primary"
       table-class="no-scroll bg-accent text-primary"
-      hide-header
+      :hide-header="!loading"
     >
       <template v-slot:top-right>
         <div class="row q-col-gutter-md">
@@ -26,7 +26,7 @@
         </div>
       </template>
       <template v-slot:top-row="props">
-        <q-tr :props="props">
+        <q-tr v-if="!loading" :props="props">
           <q-td v-for="(col,index) in props.cols" :key="index">
             <template v-if="col.type == 'string'">
               <q-input debounce="300" v-model="col.filter" style="height:12px" input-style="padding:0px;font-size:12px" dense :placeholder="`${col.label}`"/>

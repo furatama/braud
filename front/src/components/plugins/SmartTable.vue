@@ -13,7 +13,7 @@
       :rows-per-page-options="rpp"
       class="bg-secondary text-anti-primary"
       table-class="no-scroll bg-accent text-primary"
-      hide-header
+      :hide-header="!loading"
     >
       <template v-slot:top-right>
         <div class="row q-col-gutter-md">
@@ -21,7 +21,7 @@
         </div>
       </template>
       <template v-slot:top-row="props">
-        <q-tr :props="props">
+        <q-tr v-if="!loading" :props="props">
           <q-td v-for="(col,index) in props.cols" :key="index">
             <template v-if="col.type == 'string' || col.type == 'decimal' || col.type == 'integer'">
               <q-input debounce="300" v-model="col.filter" style="height:12px" input-style="padding:0px;font-size:12px" dense :placeholder="`${col.label}`"/>
@@ -30,7 +30,7 @@
               <q-toggle checked-icon="check" unchecked-icon="clear" :true-value="1" :false-value="0" v-model="col.filter" color="primary" dense style="margin-left:-15px"/>
             </template>
             <template v-else-if="col.type == 'enum'">
-              <q-select clearable dense v-model="col.filter" :options="col.options" map-options style="height:12px;min-width:80px;font-size:12px" input-style="padding:0px;font-size:12px" :label="`${col.label}`" />
+              <q-select clearable dense v-model="col.filter" :options="col.options" map-options style="height:12px;min-width:50px;font-size:12px" input-style="padding:0px;font-size:12px" :label="`${col.label}`" />
             </template>
             <template v-else-if="col.type == 'date'">
               <q-input clearable v-model="col.filter" mask="####-##-##" style="height:12px" input-style="padding:0px;font-size:12px" dense :placeholder="`${col.label}`">
@@ -180,6 +180,7 @@ export default {
           }
         }
       })
+      this.loading = true
       this.doRequest({pagination,colFilter}).then((data) => {
         this.nomor = data.from
         this.pagination.page = data.current_page
@@ -187,6 +188,8 @@ export default {
         this.pagination.rowsNumber = data.total          
       }).catch((error) => {
         console.log(error)
+      }).finally(() => {
+        this.loading = false
       })
     },
     showComponent(col,row) {

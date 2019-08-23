@@ -1,12 +1,31 @@
 <template>
   <q-page padding>
-    Report Customer
+    <report-table 
+      title="Report Customer"
+      :columns="columns"
+      :resourceURL="link"
+    />
   </q-page>
 </template>
 
 <script>
+import ReportTable from '../components/plugins/ReportTable'
+
 export default {
-  // name: 'PageName',
+  components: {
+    'report-table' : ReportTable
+  },
+  data() {
+    return {
+      link: 'report/customer',
+      columns: [
+        { name: 'date', label: 'Tanggal', type: 'date'},
+        { name: 'nama', label: 'Customer', type: 'string'},
+        { name: 'nilai', label: 'Nilai Order', type: 'decimal'},
+        { name: 'terbayar', label: 'Terbayar', type: 'decimal'}
+      ],
+    }
+  },
 }
 </script>
 

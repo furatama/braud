@@ -86,10 +86,14 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
     Route::get('order/num', 'OrderController@numOrder');
 
+    Route::get('order-detail/data/{id}', 'OrderDetailController@byIDOrder');
+
     Route::get('kredit/data', 'KreditController@index');
     Route::post('kredit/data', 'KreditController@store');
     Route::get('kredit/data/{id}', 'KreditController@show');
     Route::put('kredit/data/{id}', 'KreditController@update');
     Route::delete('kredit/data/{id}', 'KreditController@destroy');
+
+    Route::get('kredit/order/{id_order}', 'KreditController@showByIDOrder');
 
 });

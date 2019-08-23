@@ -284,9 +284,9 @@ export default {
       this.$store.dispatch("fetch",{url: `/order/num`, params: {tanggal: this.order.tanggal}})
         .then((data) => {
           let n = (Number(data.count) + 1)
-          n = n > 99 ? n.toString(36) : n.toString()
+          n = n > 999 ? n.toString(36) : n.toString()
           let tk = this.payment.method == 'cash' ? 'T' : 'K'
-          this.order.no = "BA" + this.$date.formatDate(this.order.tanggal,"YYMMDD") + n.padStart(2,'0') + tk
+          this.order.no = "BA" + this.$date.formatDate(this.order.tanggal,"YYMMDD") + n.padStart(3,'0') + tk
         }).catch((error) => {
           console.log(error)
           this.$notifyNegative("Gagal Mengambil Data No Order")
@@ -358,6 +358,7 @@ export default {
         tanggal: this.orderDate,
         faktur: '',
         tunai: this.payment.paid,
+        total: this.table.grandTotal,
         keterangan: '',
         detail: this.table.data.map((v) => {
           return {
@@ -366,7 +367,7 @@ export default {
             qty: v.qty,
             diskon: v.diskon
           }
-        })
+        }),
       }
       this.$store.dispatch("postSingle",{url: `/order/data`,inputs})
         .then((response) => {

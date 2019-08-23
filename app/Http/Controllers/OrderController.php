@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Order;
+use App\Kredit;
 
 class OrderController extends Controller
 {
@@ -20,6 +21,14 @@ class OrderController extends Controller
         $request->request->add(["id_user" => auth()->user()->id]);
         $data = (new Order)->record($request); 
         $data = $data->recordDetail($request->detail);     
+
+        $kreditParams = [
+            "id_order" => $data->id,
+            "tunai" => min($request->total,$request->tunai)
+        ];
+        if ($kreditParams['tunai'] > 0)
+            $kredit = (new Kredit)->record($kreditParams);
+
         return bd_json($data);
     }
 
@@ -31,8 +40,18 @@ class OrderController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->request->add(["id_user" => auth()->user()->id]);
         $data = Order::find($id)->record($request);
         $data = $data->deleteDetail()->recordDetail($request->detail);
+
+        Kredit::where('id_order',$id)->delete();
+        $kreditParams = [
+            "id_order" => $data->id,
+            "tunai" => min($request->total,$request->tunai)
+        ];
+        if ($kreditParams['tunai'] > 0)
+            $kredit = (new Kredit)->record($kreditParams);
+
         return bd_json($data);
     }
 
@@ -42,6 +61,7 @@ class OrderController extends Controller
         if ($data) {
             $data->deleteDetail();
             $data->delete();
+            Kredit::where('id_order',$id)->delete();
         }
         return bd_json($data);
     }

@@ -30,14 +30,14 @@
               <q-toggle checked-icon="check" unchecked-icon="clear" :true-value="1" :false-value="0" v-model="col.filter" color="primary" dense style="margin-left:-15px"/>
             </template>
             <template v-else-if="col.type == 'enum'">
-              <q-select clearable dense v-model="col.filter" :options="col.options" map-options style="height:12px;min-width:80px;font-size:12px" input-style="padding:0px;font-size:12px" dense :label="`${col.label}`" />
+              <q-select clearable dense v-model="col.filter" :options="col.options" map-options style="height:12px;min-width:80px;font-size:12px" input-style="padding:0px;font-size:12px" :label="`${col.label}`" />
             </template>
             <template v-else-if="col.type == 'date'">
               <q-input clearable v-model="col.filter" mask="####-##-##" style="height:12px" input-style="padding:0px;font-size:12px" dense :placeholder="`${col.label}`">
                 <template v-slot:after>
                   <q-icon name="event" class="cursor-pointer" style="margin-top:-25px">
                     <q-popup-proxy>
-                      <q-date v-model="col.filter"/>
+                      <q-date mask="YYYY-MM-DD" v-model="col.filter"/>
                     </q-popup-proxy>
                   </q-icon>
                 </template>
@@ -83,7 +83,7 @@
       </template>
     </q-table>
 
-    <q-dialog v-model="componentDialog">
+    <q-dialog v-model="componentDialog" @hide="onRequest()">
       <q-card style="width:80vw;max-width:100vw">
         <q-bar class="bg-primary text-white">
           <div class="text-h6">{{component.title}}</div>
@@ -97,7 +97,7 @@
         
         <q-card-section class="q-pa-none q-ma-none">
           <q-scroll-area style="height:85vh" class="q-px-md">
-            <component class="q-pa-md" :data="component.data" :is="component.component"></component>
+            <component @closeDialog="componentDialog = false" class="q-pa-md" :data="component.data" :is="component.component"></component>
           </q-scroll-area>
         </q-card-section>
       </q-card>
@@ -165,7 +165,7 @@ export default {
     }
   },
   methods: {
-    onRequest(props) {
+    onRequest(props = this) {
       let pagination = props.pagination || this.pagination
       let cols = props.cols || this.cols
       let colFilter = {} 
@@ -180,7 +180,6 @@ export default {
           }
         }
       })
-      console.log(colFilter)
       this.doRequest({pagination,colFilter}).then((data) => {
         this.nomor = data.from
         this.pagination.page = data.current_page
@@ -196,7 +195,6 @@ export default {
         component: col.component,
         data: row
       }
-      console.log(this.component)
       this.componentDialog = true
     },
     enumValue(col,row) {

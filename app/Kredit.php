@@ -15,4 +15,8 @@ class Kredit extends Model
     protected $hidden = ['deleted_at', 'created_at','updated_at'];
 
     protected $fillable = ['id_order','tunai','keterangan'];
+
+    public static function orderSum($id_order) {
+        return Kredit::where('id_order',$id_order)->sum('tunai');
+    }
 }

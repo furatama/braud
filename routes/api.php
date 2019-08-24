@@ -55,6 +55,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('produk/detail/{id}', 'ProdukController@showWithDetail');
 
     Route::get('produk/aktif', 'ProdukController@indexAktif');
+    Route::get('produk/all', 'ProdukController@indexAll');
     Route::get('produk/customer/{id_customer}', 'ProdukController@byCustomer');
 
     Route::get('harga/data', 'HargaController@index');
@@ -99,5 +100,9 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('report/customer','ReportController@customer');
     Route::get('report/produk','ReportController@produk');
     Route::get('report/order','ReportController@order');
+
+    Route::get('report/customer/excel','ReportController@customerExcel');
+    Route::get('report/produk/excel','ReportController@produkExcel');
+    Route::get('report/order/excel','ReportController@orderExcel');
 
 });

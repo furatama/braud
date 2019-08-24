@@ -70,13 +70,14 @@ export default {
       this.listHarga.splice(index,1)
     },
     fillOptions(index) {
-      this.$store.dispatch("fetchOptions",{url: '/produk/aktif'})
+      this.$store.dispatch("fetchOptions",{url: '/produk/all'})
         .then((response) => {
           let data = response.data
           this.produkOpts = data.map((v) => {
             return {
-              label: v.nama,
-              value: v.id
+              label: v.aktif == 1 ? v.nama : v.nama + ' (<b>NONAKTIF</b>)',
+              value: v.id,
+              aktif: v.aktif
             }
           })
         }).catch((error) => {

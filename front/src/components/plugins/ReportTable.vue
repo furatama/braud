@@ -16,7 +16,7 @@
       <template v-slot:top-right>
         <div class="row reverse q-col-gutter-md">
           <div>
-            <q-btn label="Export XLS" color="green"/>
+            <q-btn label="Export XLS" color="green" @click="exportXLS"/>
           </div>
           <div>
             <q-btn-dropdown
@@ -152,6 +152,14 @@ export default {
         this.titleComputed = `${this.title} [... ~ ${this.$date.formatDate(this.filterSampai,'DD/MM/YYYY')}]`
       else
         this.titleComputed = this.title
+    },
+    exportXLS() {
+      let params = {
+        method: this.filter,
+        from: this.filterDari || null,
+        to: this.filterSampai || null,
+      }
+      this.$store.dispatch("getXLS",{url: this.resourceURL + '/excel', params, filename: this.titleComputed})
     }
   },
   created() {

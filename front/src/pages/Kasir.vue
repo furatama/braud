@@ -129,7 +129,7 @@
             <div class="col"><q-btn class="full-width" dense color="primary" label="100.000" @click="addMoney(100000)"/></div>
             <div class="col"><q-btn class="full-width" dense color="positive" label="PAS" @click="addMoney('pas')"/></div>
           </div>
-          <q-input label="Kembalian" :value="$numeralCurrency(exchange)" readonly input-class="text-right text-h5"/>
+          <q-input :label="exchangeLabel" :value="displayExchange" readonly input-class="text-right text-h5"/>
         </q-card-section>
 
         <q-card-actions align="right" class="bg-primary text-white">
@@ -211,6 +211,12 @@ export default {
     }
   },
   computed: {
+    displayExchange() {
+      return this.payment.method === 'cash' ? this.$numeralCurrency(this.exchange) : this.$numeralCurrency(-this.exchange)
+    },
+    exchangeLabel() {
+      return this.payment.method === 'cash' ? 'Kembalian' : 'Sisa Hutang'
+    },
     customerData() {
       this.table.data = []
       return this.order.customer

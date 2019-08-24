@@ -30,4 +30,25 @@ class ReportController extends Controller
         $data = Report::order($method,$from,$to);
         return bd_json(Report::envelop($data));
     }
+
+    public function customerExcel(Request $request) {
+        $method = $request->input('method','d');
+        $from = $request->input('from',null);
+        $to = $request->input('to',null);
+        Report::excelCustomer($method,$from,$to);
+    }
+
+    public function produkExcel(Request $request) {
+        $method = $request->input('method','d');
+        $from = $request->input('from',null);
+        $to = $request->input('to',null);
+        Report::excelProduk($method,$from,$to);
+    }
+
+    public function orderExcel(Request $request) {
+        $method = $request->input('method','d');
+        $from = $request->input('from',null);
+        $to = $request->input('to',null);
+        Report::excelOrder($method,$from,$to);
+    }
 }

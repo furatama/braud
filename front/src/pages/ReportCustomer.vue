@@ -21,6 +21,7 @@ export default {
       columns: [
         { name: 'date', label: 'Tanggal', type: 'date'},
         { name: 'nama', label: 'Customer', type: 'string'},
+        { name: 'qty', label: 'Jumlah Produk', type: 'integer'},
         { name: 'nilai', label: 'Nilai Order', type: 'decimal'},
         { name: 'terbayar', label: 'Terbayar', type: 'decimal'}
       ],

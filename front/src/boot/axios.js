@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+const isLocalHost = window.location.hostname === 'localhost'
+
 const axiosInstance = axios.create({
-  baseURL: '/api/'
+  baseURL: isLocalHost ? '/braud/public/api/' : '/public/api/'
 })
 
 export default ({ Vue }) => {

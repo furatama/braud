@@ -75,11 +75,11 @@ module.exports = function (ctx) {
       port: 8888,
       proxy: {
         // proxy all requests starting with /api to jsonplaceholder
-        '/api': {
+        '/braud/public/api': {
           target: 'http://localhost/braud/public/api/',
           changeOrigin: true,
           pathRewrite: {
-            '^/api': ''
+            '^/braud/public/api': ''
           }
         },
       },

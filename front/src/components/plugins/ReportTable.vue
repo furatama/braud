@@ -80,10 +80,10 @@ export default {
       filter: 'd',
       filterDari: '',
       filterSampai: '',
-      rpp: [3,7,15,50,100,500],
+      rpp: [5,7,9,15,50,100,500],
       pagination: {
         page: 1,
-        rowsPerPage: 7,
+        rowsPerPage: 9,
         rowsNumber: 10,
       },
       data: [],

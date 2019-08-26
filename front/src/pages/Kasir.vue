@@ -3,7 +3,7 @@
     <div class="row q-col-gutter-sm">
       <div class="col-9">
         <div class="row q-gutter-sm">
-          <q-input v-model="order.no" readonly outlined label="No Order"/>
+          <q-input v-model="order.no" readonly outlined label="No Order" :loading="loading" />
           <q-input v-model="order.tanggal" outlined label="Tanggal Order" mask="####/##/##" placeholder="YYYY/MM/DD">
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
@@ -13,7 +13,7 @@
               </q-icon>
             </template>
           </q-input>
-          <select-filter outlined label="Customer" v-model="order.customer" :options="order.customerOpts"/>
+          <select-filter outlined label="Customer" v-model="order.customer" :options="order.customerOpts" :loading="loading"/>
         </div>
         <q-separator class="q-my-sm"/>
 
@@ -94,6 +94,10 @@
                 </q-item-section>
                 <q-item-section side>{{`Rp ${$numeral(data.harga).format('0,0')}`}}</q-item-section>
               </q-item>
+
+            <q-inner-loading :showing="loading">
+              <q-spinner-dots size="50px" color="primary" />
+            </q-inner-loading>
             </q-scroll-area>
           </q-list>
         </div>
@@ -211,6 +215,9 @@ export default {
     }
   },
   computed: {
+    loading() {
+      return this.$store.state.loading 
+    },
     displayExchange() {
       return this.payment.method === 'cash' ? this.$numeralCurrency(this.exchange) : this.$numeralCurrency(-this.exchange)
     },
@@ -287,12 +294,12 @@ export default {
         })
     },
     loadNoOrder() {
-      this.$store.dispatch("fetch",{url: `/order/num`, params: {tanggal: this.order.tanggal}})
+      this.$store.dispatch("fetch",{url: `/order/num`, params: {tanggal: this.order.tanggal, metode: this.payment.method}})
         .then((data) => {
           let n = (Number(data.count) + 1)
           n = n > 999 ? n.toString(36) : n.toString()
           let tk = this.payment.method == 'cash' ? 'T' : 'K'
-          this.order.no = "BA" + this.$date.formatDate(this.order.tanggal,"YYMMDD") + n.padStart(3,'0') + tk
+          this.order.no = "BA" + this.$date.formatDate(this.order.tanggal,"YYMMDD") + tk + n.padStart(3,'0')
         }).catch((error) => {
           console.log(error)
           this.$notifyNegative("Gagal Mengambil Data No Order")

@@ -19,7 +19,9 @@ Route::group([
 //Tambah route dibawah sini
 
 //taruh Route di luar sini untuk yang tidak perlu authentikasi
-//Route::get('data', 'DataController@data');
+Route::get('data', function() {
+    echo "asdf";
+});
 
 //Buat beberapa route:group untuk hak akses yang berbeda2 pisahkan dengan | jika ada 2 atau lebih hak akses yang dapat menggunakannya
 //Route::group(['middleware' => ['jwt.verify:<HAK_AKSES>']], function ()) {....

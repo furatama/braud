@@ -66,7 +66,10 @@
 
         <div class="row q-mt-sm justify-between">
           <q-btn :disabled="table.data.length <= 0" label="RESET" color="info" icon="refresh" @click="() => {resetForm()}"/>
-          <q-btn :disabled="table.data.length <= 0" label="CHECKOUT" color="positive" icon="local_grocery_store" @click="() => {checkout.isShow = true}"/>
+          <div class="row q-col-gutter-md">
+            <div><q-btn :disabled="table.data.length <= 0" label="CHECKOUT CREDIT" color="light-green" icon="local_grocery_store" @click="addOrder('credit')"/></div>
+            <div><q-btn :disabled="table.data.length <= 0" label="CHECKOUT CASH" color="green" icon="local_grocery_store" @click="addOrder('cash')"/></div>
+          </div>
         </div>
 
       </div>
@@ -204,8 +207,8 @@ export default {
         paid: 0,
         method: 'cash',
         options: [
-          {label: 'Tunai', value: 'cash'},
-          {label: 'Kredit', value: 'credit'},
+          {label: 'Cash', value: 'cash'},
+          {label: 'Credit', value: 'credit'},
         ],
       }
     }
@@ -231,7 +234,7 @@ export default {
         no: this.order.no,
         tanggal: this.$date.formatDate(this.order.tanggal, 'DD/MMMM/YYYY'),
         kasir: this.$store.getters.getName,
-        method: this.payment.method == 'cash' ? "TUNAI" : "KREDIT",
+        method: this.payment.method == 'cash' ? "CASH" : "CREDIT",
         cust: {
           nama: this.customerData.label,
           email: this.customerData.email,
@@ -393,6 +396,16 @@ export default {
     },
     printOrder() {
       this.$refs.printer.print()
+    },
+    addOrder(metode) {
+      if (metode === 'cash') {
+        this.payment.paid = this.table.grandTotal
+      } else {
+        this.payment.paid = 0
+      }
+      this.payment.method = metode
+      this.submitOrder()
+      this.printOrder()
     }
   },
   mounted() {

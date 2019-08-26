@@ -5,8 +5,8 @@
       style="
         font-family: 'Draft 17cpi', 'Consolas', Courier, monospace;
         font-size: 12px;
-        margin: 5% 2% 0 2%;
-        width: 96%;
+        margin: 0 2% 0 0;
+        width: 90%;
     ">
       <tr style="font-size: 14px;">
         <td style="vertical-align: top; width:40%; font-weight:bold; font-size: 20px;">
@@ -14,11 +14,11 @@
           <div style="height:2px"/>
         </td>
         <td style="vertical-align: bottom;"  >
-          <span style="border-bottom: 1px solid;">NO: {{data.no}}</span>
+          
           <div style="height:2px"/>
         </td>
-        <td style="vertical-align: bottom; width:15%; text-align:right">
-          {{data.method}}
+        <td style="vertical-align: bottom; width:25%; text-align:right">
+          <span style="border-bottom: 1px solid;">NO: {{data.no}}</span>
           <div style="height:2px"/>
         </td>
       </tr>
@@ -49,14 +49,14 @@
         </td>
       </tr>
     </table>
-    <hr/>
+    <br/>
     <table 
       border="0" cellpadding="0px" cellspacing="0px"
       style="
         font-family: 'Draft 17cpi', 'Consolas', Courier, monospace;
         font-size: 14px;
-        margin: 0 2% 0 2%;
-        width: 96%;
+        margin: 0 2% 0 0;
+        width: 90%;
         
         border: 0.5px solid;
     ">
@@ -89,31 +89,33 @@
         <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px solid;border-right: 1px solid;vertical-align:top">{{item.subtotal}}</td>
       </tr>
     </table>
-    <div align="right" style="
-      width: 96%;
-      margin: 1% 2% 0 2%;
+    <div  align="right" style="
+      width: 90%;
+      margin: 1% 2% 0 0;
       font-family: 'Draft 17cpi', 'Consolas', Courier, monospace;
       font-size: 14px;
     ">
       <div style="display:flex;justify-content: flex-end;">
         <div style="width:15%;margin-right:5px">Total : </div>
         <div style="width:15%;margin-right:5px">{{data.total}}</div>
-      </div><div style="display:flex;justify-content: flex-end;">
-        <div style="width:15%;margin-right:5px">{{data.tunaiLabel}} : </div>
-        <div style="width:15%;margin-right:5px">{{data.tunai}}</div>
-      </div><div style="display:flex;justify-content: flex-end;">
+      </div>
+      <div style="display:flex;justify-content: flex-end;">
+        <div style="width:15%;margin-right:5px">Metode : </div>
+        <div style="width:15%;margin-right:5px">{{data.method}}</div>
+      </div>
+      <!-- <div style="display:flex;justify-content: flex-end;">
         <div style="width:15%;margin-right:5px">{{data.sisaLabel}} : </div>
         <div style="width:15%;margin-right:5px">{{data.sisa}}</div>
-      </div>
+      </div> -->
     </div>
     <div style="
-      width: 96%;
-      margin: -50px 2% 0 2%;
+      width: 90%;
+      margin: -25px 5% 0 0;
       font-family: 'Draft 17cpi', 'Consolas', Courier, monospace;
       font-size: 14px;
     ">
       <div style="display:flex;">
-        <div style="width:150px">
+        <div style="width:150px; margin-left: 10%">
           <div align="center">Penerima</div>
           <br/>
           <div>(________________)</div>

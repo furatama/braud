@@ -97,6 +97,13 @@ export default {
     value(val) {
       console.log('value',val)
       this.model = val
+    },
+    model(val) {
+      if (!isNaN(val)) {
+        this.model = this.options.find((el) => {
+          return el.value == this.value
+        })
+      }
     }
   },
   mounted() {

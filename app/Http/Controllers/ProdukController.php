@@ -31,6 +31,12 @@ class ProdukController extends Controller
         return bd_json($data);
     }
 
+    public function indexAll()
+    {        
+        $data = Produk::orderBy('nama')->get();
+        return bd_json($data);
+    }
+
     public function store(Request $request)
     {
         $data = (new Produk)->record($request);      

@@ -281,7 +281,7 @@ export default {
       })
     },
     loadCustomer() {
-      this.$store.dispatch("fetchSingle",{url: '/customer/data/', id:this.data.id_customer})
+      this.$store.dispatch("fetchSingle",{url: '/customer/data', id:this.data.id_customer})
         .then((response) => {
           let data = response.data
           this.customerData = {

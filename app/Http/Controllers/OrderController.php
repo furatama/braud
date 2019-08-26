@@ -87,7 +87,8 @@ class OrderController extends Controller
 
     public function numOrder(Request $request) {
         $date = $request->tanggal;
-        $data = Order::whereDate('tanggal',$date)->count();
+        $metode = $request->metode;
+        $data = \DB::table('order')->whereDate('tanggal',$date)->where('metode',$metode)->count();
         return bd_json(["count" => $data]);
     }
 

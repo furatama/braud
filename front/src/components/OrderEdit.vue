@@ -12,14 +12,15 @@
         </div>
         <q-separator class="q-my-sm"/>
 
-        <div class="row q-my-sm justify-end">
+        <div class="row q-my-sm justify-between">
           <q-banner v-show="editMode" dense class="bg-yellow text-negative full-width">      
             <template v-slot:avatar>
               <q-icon name="warning" color="negative" />
             </template>
             Mengubah/Menghapus order akan menghapus semua kredit yang telah dilakukan (jika metode pembayaran kredit)
           </q-banner>
-          <q-btn v-show="!editMode" label="EDIT ORDER" color="warning" icon="edit" @click="editMode = true"/>
+          <q-btn v-show="!editMode" :disabled="nilaiTunai >= table.grandTotal" label="BAYAR KREDIT" color="info" icon="attach_money" @click="kredit.dialog = true"/>
+          <q-btn v-show="!editMode" label="EDIT / HAPUS ORDER" color="warning" icon="edit" @click="editMode = true"/>
         </div>
 
         <q-table
@@ -76,7 +77,7 @@
         </q-table>
 
         <div class="row q-mt-sm justify-between">
-          <q-btn v-show="!editMode" :disabled="nilaiTunai >= table.grandTotal" label="KREDIT" color="info" icon="attach_money" @click="kredit.dialog = true"/>
+          <div v-show="!editMode"/>
           <q-btn v-show="editMode" label="HAPUS ORDER" color="negative" icon="delete">
             <q-popup-proxy :breakpoint="600">
               <q-banner inline-actions class="bg-negative text-white">

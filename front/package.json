@@ -2,7 +2,7 @@
   "name": "braudfront",
   "version": "0.0.1",
   "description": "kasir braud",
-  "productName": "braud",
+  "productName": "Braud Artisan Bakery",
   "cordovaId": "org.cordova.quasar.app",
   "author": "bdsm",
   "private": true,

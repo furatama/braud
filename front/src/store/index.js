@@ -24,6 +24,19 @@ export default function (/* { ssrContext } */) {
         role: '',
         name: '',
       },
+      printout: {
+        margin: {
+          left: LocalStorage.getItem('pml') || 0,
+          top: LocalStorage.getItem('pmt') || 0,
+        },
+        font: {
+          one: LocalStorage.getItem('pf1') || "'Draft 17cpi', 'Consolas', Courier, monospace",
+          two: LocalStorage.getItem('pf2') || "'Draft 17cpi', 'Consolas', Courier, monospace",
+          three: LocalStorage.getItem('pf3') || "'Draft 17cpi', 'Consolas', Courier, monospace",
+        },
+        width: LocalStorage.getItem('pw') || "90%",
+        rows: LocalStorage.getItem('pr') || 12,
+      },
       loading: false
     },
 
@@ -36,7 +49,10 @@ export default function (/* { ssrContext } */) {
       },
       getRole(state) {
         return state.auth.role
-      }      
+      },
+      getPrintout(state) {
+        return state.printout
+      }
     },
 
     mutations: {
@@ -72,6 +88,23 @@ export default function (/* { ssrContext } */) {
       loadingEnd (state) {
         state.loading = false
       },
+      setPrintoutSettings(state, payload) {
+        state.printout.margin.left = payload.margin.left
+        LocalStorage.set('pml', payload.margin.left)
+        state.printout.margin.top = payload.margin.top
+        LocalStorage.set('pmt', payload.margin.top)
+        state.printout.font.one = payload.font.one
+        LocalStorage.set('pf1', payload.font.one)
+        state.printout.font.two = payload.font.two
+        LocalStorage.set('pf2', payload.font.two)
+        state.printout.font.three = payload.font.three
+        LocalStorage.set('pf3', payload.font.three)
+        state.printout.width = payload.width
+        LocalStorage.set('pw', payload.width)
+        state.printout.rows = payload.rows
+        LocalStorage.set('pw', payload.rows)
+        console.log('updated')
+      }
 
     },
 

@@ -16,7 +16,7 @@
       <template v-slot:top-right>
         <div class="row reverse q-col-gutter-md">
           <div>
-            <q-btn label="Export XLS" color="green" @click="exportXLS"/>
+            <q-btn label="Export Ke Excel" color="green" @click="exportXLS"/>
           </div>
           <div>
             <q-btn-dropdown
@@ -26,6 +26,7 @@
               @hide="onRequest"
             >
               <div class="q-pa-sm">
+                <div class="text-h6 q-mb-sm">Jenis Report</div>
                 <div class="">
                   <q-option-group
                     v-model="filter"
@@ -36,6 +37,15 @@
                 </div>
 
                 <q-separator inset class="q-my-sm" />
+
+                <div class="text-h6 q-mb-sm">Scope Report</div>
+
+                <div class="row q-col-gutter-sm">
+                  <div><q-btn @click="setDate('d')" color="green-5" label="Hari Ini"/></div>
+                  <div><q-btn @click="setDate('w')" color="green-6" label="Minggu Ini"/></div>
+                  <div><q-btn @click="setDate('m')" color="green-7" label="Bulan Ini"/></div>
+                  <div><q-btn @click="setDate('y')" color="green-8" label="Tahun Ini"/></div>
+                </div>
 
                 <div class="row q-col-gutter-sm">
                   <q-input clearable label="Dari" v-model="filterDari" mask="####/##/##" placeholder="YYYY/MM/DD">
@@ -83,7 +93,7 @@ export default {
       rpp: [5,7,9,15,50,100,500],
       pagination: {
         page: 1,
-        rowsPerPage: 9,
+        rowsPerPage: 50,
         rowsNumber: 10,
       },
       data: [],
@@ -129,29 +139,34 @@ export default {
     },
     reformat() {
       let index = this.dateIndex
+      let jenis = ""
       if (this.filter === 'd') {
         this.cols[index].label = 'Tanggal'
         this.cols[index].format = (val, row) => { return this.$date.formatDate(val, 'DD/MMMM/YYYY') }
+        jenis = "[Harian]"
       } else if (this.filter === 'm') {
         this.cols[index].label = 'Bulan'
         this.cols[index].format = (val, row) => { return this.$date.formatDate(val, 'MMMM/YYYY') }
+        jenis = "[Bulanan]"
       } else if (this.filter === 'y') {
         this.cols[index].label = 'Tahun'
         this.cols[index].format = (val, row) => { return this.$date.formatDate(val, 'YYYY') }
+        jenis = "[Tahunan]"
       } else if (this.filter === 'a') {
         this.cols[index].label = '-'
         this.cols[index].format = (val, row) => { return '-' }
+        jenis = "[Keseluruhan]"
       }
 
       
       if (this.filterDari && this.filterSampai)
-        this.titleComputed = `${this.title} [${this.$date.formatDate(this.filterDari,'DD/MM/YYYY')} ~ ${this.$date.formatDate(this.filterSampai,'DD/MM/YYYY')}]`
+        this.titleComputed = `${this.title} ${jenis} [${this.$date.formatDate(this.filterDari,'DD/MM/YYYY')} ~ ${this.$date.formatDate(this.filterSampai,'DD/MM/YYYY')}]`
       else if (this.filterDari)
-        this.titleComputed = `${this.title} [${this.$date.formatDate(this.filterDari,'DD/MM/YYYY')} ~ ...]`
+        this.titleComputed = `${this.title} ${jenis} [${this.$date.formatDate(this.filterDari,'DD/MM/YYYY')} ~ ...]`
       else if (this.filterSampai)
-        this.titleComputed = `${this.title} [... ~ ${this.$date.formatDate(this.filterSampai,'DD/MM/YYYY')}]`
+        this.titleComputed = `${this.title} ${jenis} [... ~ ${this.$date.formatDate(this.filterSampai,'DD/MM/YYYY')}]`
       else
-        this.titleComputed = this.title
+        this.titleComputed = `${this.title} ${jenis}`
     },
     exportXLS() {
       let params = {
@@ -160,6 +175,31 @@ export default {
         to: this.filterSampai || null,
       }
       this.$store.dispatch("getXLS",{url: this.resourceURL + '/excel', params, filename: this.titleComputed})
+    },
+    setDate(where) {
+      let today = new Date()
+      let date = this.$date
+      if (where == 'd') {
+        this.filterDari = date.formatDate(today,'YYYY/MM/DD')
+        this.filterSampai = date.formatDate(today,'YYYY/MM/DD')
+      } else if (where == 'w') {
+        let wk = date.getDayOfWeek(today)
+        let start = date.subtractFromDate(today, {days: wk-1})
+        let end = date.addToDate(today, {days: 7-wk})
+        this.filterDari = date.formatDate(start,'YYYY/MM/DD')
+        this.filterSampai = date.formatDate(end,'YYYY/MM/DD')
+      } else if (where == 'm') {
+        let mon = date.daysInMonth(today)
+        let start = date.adjustDate(today, {date: 1})
+        let end = date.adjustDate(today, {date: mon})
+        this.filterDari = date.formatDate(start,'YYYY/MM/DD')
+        this.filterSampai = date.formatDate(end,'YYYY/MM/DD')
+      } else if (where == 'y') {
+        let start = date.adjustDate(today, {date: 1, month: 1})
+        let end = date.adjustDate(today, {date: 31, month: 12})
+        this.filterDari = date.formatDate(start,'YYYY/MM/DD')
+        this.filterSampai = date.formatDate(end,'YYYY/MM/DD')
+      }
     }
   },
   created() {

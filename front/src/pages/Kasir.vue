@@ -3,7 +3,7 @@
     <div class="row q-col-gutter-sm">
       <div class="col-9">
         <div class="row q-gutter-sm">
-          <q-input v-model="order.no" readonly outlined label="No Order" :loading="loading" />
+          <q-input v-show="false" v-model="order.no" readonly outlined label="No Order" :loading="loading" />
           <q-input v-model="order.tanggal" outlined label="Tanggal Order" mask="####/##/##" placeholder="YYYY/MM/DD">
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
@@ -13,7 +13,7 @@
               </q-icon>
             </template>
           </q-input>
-          <select-filter outlined label="Customer" v-model="order.customer" :options="order.customerOpts" :loading="loading"/>
+          <select-filter class="col-8" outlined label="Customer" v-model="order.customer" :options="order.customerOpts" :loading="loading"/>
         </div>
         <q-separator class="q-my-sm"/>
 
@@ -40,7 +40,7 @@
                   <q-input @input="refreshSubtotal(table.data[props.row.__index])" type="number" dense v-model="table.data[props.row.__index][col.name]" input-class="text-right" style="width:40px;float:right"/>
                 </template>
                 <template v-else-if="col.name == 'diskon'">
-                  <q-input @input="refreshSubtotal(table.data[props.row.__index])" type="number" dense v-model="table.data[props.row.__index][col.name]" input-class="text-right" style="width:50px;float:right">
+                  <q-input min="0" max="100" step="5" @input="refreshSubtotal(table.data[props.row.__index])" type="number" dense v-model="table.data[props.row.__index][col.name]" input-class="text-right" style="width:50px;float:right">
                     <template v-slot:after>
                       <span class="text-body2">%</span>
                     </template>
@@ -76,7 +76,7 @@
     <!-- <div class="flex q-gutter-xs">
       <q-btn size="sm" dense v-for="n in 30" :label="`bread asdf croissant ${n*10*n}`" icon="add"/>
     </div> -->
-      <div class="col-3">
+      <div class="fixed-right" style="top:6vh;right:10px">
         <div class="q-pt-sm">
           <q-list bordered separator class="bg-accent" >
             <q-item dark class="bg-primary">
@@ -89,7 +89,7 @@
               </q-item-section>
             </q-item>
 
-            <q-scroll-area style="height:75vh">
+            <q-scroll-area style="height:80vh">
               <q-item  v-for="(data,index) in produkData" clickable v-ripple :key="index" @click="selectSearchedItem(data)">
                 <q-item-section>
                   <q-item-label>{{data.nama}}</q-item-label>
@@ -189,8 +189,8 @@ export default {
       table: {
         columns: [
           { name: 'produk', align: 'left', label: 'PRODUK', field: 'produk', sortable: false },
-          { name: 'harga', align: 'right', label: 'HARGA', field: 'harga', sortable: false },
           { name: 'qty', align: 'right', label: 'QTY', field: 'qty', sortable: false },
+          { name: 'harga', align: 'right', label: 'HARGA', field: 'harga', sortable: false },
           { name: 'diskon', align: 'right', label: 'DISKON', field: 'diskon', sortable: false },
           { name: 'subtotal', align: 'right', label: 'SUBTOTAL', field: 'subtotal', sortable: false },
           { name: 'action', field: 'action', label: '', sortable: false, style: 'width:10px;padding:0'}
@@ -297,16 +297,20 @@ export default {
         })
     },
     loadNoOrder() {
-      this.$store.dispatch("fetch",{url: `/order/num`, params: {tanggal: this.order.tanggal, metode: this.payment.method}})
-        .then((data) => {
-          let n = (Number(data.count) + 1)
-          n = n > 999 ? n.toString(36) : n.toString()
-          let tk = this.payment.method == 'cash' ? 'T' : 'K'
-          this.order.no = "BA" + this.$date.formatDate(this.order.tanggal,"YYMMDD") + tk + n.padStart(3,'0')
-        }).catch((error) => {
-          console.log(error)
-          this.$notifyNegative("Gagal Mengambil Data No Order")
-        })
+      return new Promise((resolve,reject) => {
+        this.$store.dispatch("fetch",{url: `/order/num`, params: {tanggal: this.order.tanggal, metode: this.payment.method}})
+          .then((data) => {
+            let n = (Number(data.count) + 1)
+            n = n > 999 ? n.toString(36) : n.toString()
+            let tk = this.payment.method == 'cash' ? 'T' : 'K'
+            this.order.no = "BA" + this.$date.formatDate(this.order.tanggal,"YYMMDD") + tk + n.padStart(3,'0')
+            resolve()
+          }).catch((error) => {
+            console.log(error)
+            this.$notifyNegative("Gagal Mengambil Data No Order")
+            reject()
+          })
+      })
     },
     loadProduk() {
       this.$store.dispatch("fetchOptions",{url: `/produk/customer/${this.customerData.value}`})
@@ -417,8 +421,10 @@ export default {
         this.payment.paid = 0
       }
       this.payment.method = metode
-      this.submitOrder()
-      this.printOrder()
+      this.loadNoOrder().then(() => {
+        this.submitOrder()
+        this.printOrder()
+      })
     }
   },
   mounted() {

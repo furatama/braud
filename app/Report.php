@@ -100,9 +100,12 @@ class Report extends Model
         } else if ($method === 'm') {
             $result = $result->groupBy('date')->orderBy('date');
             $tanggal = "CONCAT(DATE_FORMAT(tanggal, '%Y-%m'),'-01')";
-        } else if ($method === 'd' || $method === 'a') {
+        } else if ($method === 'd') {
             $result = $result->groupBy('date')->orderBy('date');
             $tanggal = "order.tanggal";
+        } else if ($method === 'a') {
+            $result = $result->groupBy('date')->orderBy('date');
+            $tanggal = "2000";
         }
 
         $result = $result->select(DB::raw($tanggal . ' as date'),

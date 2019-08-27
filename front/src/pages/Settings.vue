@@ -18,6 +18,22 @@
         <q-btn type="submit" label="Update Password" color="positive"/>
       </div>
     </form>
+    <q-separator class="q-my-lg"/>
+    <form @submit.prevent="updatePrintout" class="column q-col-gutter-md q-px-xl">
+      <span class="text-h5">Printout</span>
+      <div class="row q-col-gutter-md">
+        <q-input outlined v-model="printout.margin.left" label="Margin Left"/>
+        <q-input outlined v-model="printout.margin.top" label="Margin Top"/>
+      </div>
+      <q-input outlined v-model="printout.font.one" label="Font Family 1"/>
+      <q-input outlined v-model="printout.font.two" label="Font Family 2"/>
+      <q-input outlined v-model="printout.font.three" label="Font Family 3"/>
+      <q-input outlined v-model="printout.width" label="Print Width"/>
+      <q-input outlined v-model="printout.rows" label="Limit Item Per Nota"/>
+      <div class="row justify-end">
+        <q-btn type="submit" label="Update Printout" color="positive"/>
+      </div>
+    </form>
     <q-inner-loading :showing="loading">
       <q-spinner-dots size="50px" color="primary" />
     </q-inner-loading>
@@ -32,7 +48,8 @@ export default {
       username: '',
       nama: '',
       oldPassword: '',
-      password: ''
+      password: '',
+      printout: {}
     }
   },
   computed: {
@@ -40,7 +57,10 @@ export default {
       get() {
         return this.$store.state.loading 
       }
-    }
+    },
+    // printout() {
+    //   return this.$store.getters.getPrintout
+    // }
   },
   methods: {
     loadInfo() {
@@ -84,10 +104,38 @@ export default {
           console.log(error)
           this.$notifyNegative("Gagal Mengupdate Informasi")
         })
+    },
+    updatePrintout() {
+      this.$store.commit('setPrintoutSettings', {
+        margin : {
+          left: this.printout.margin.left,
+          top: this.printout.margin.top,
+        },
+        font : {
+          one: this.printout.font.one,
+          two: this.printout.font.two,
+          three: this.printout.font.three,
+        },
+        width: this.printout.width,
+        rows: this.printout.rows,
+      })
     }
   },
   created() {
     this.loadInfo()
+    this.printout = {
+      margin : {
+          left: this.$store.state.printout.margin.left,
+          top: this.$store.state.printout.margin.top,
+        },
+        font : {
+          one: this.$store.state.printout.font.one,
+          two: this.$store.state.printout.font.two,
+          three: this.$store.state.printout.font.three,
+        },
+        width: this.$store.state.printout.width,
+        rows: this.$store.state.printout.rows,
+      }
   },
 }
 </script>

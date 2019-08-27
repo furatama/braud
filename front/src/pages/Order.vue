@@ -27,7 +27,7 @@ export default {
         { name: 'no', label: 'No Order', type: 'string'},
         { name: 'customer', label: 'Customer', type: 'string'},
         { name: 'metode', label: 'Metode', type: 'enum', options: [
-          {label: 'Tunai', value: 'cash'},{label: 'Kredit', value: 'credit'},
+          {label: 'Cash', value: 'cash'},{label: 'Credit', value: 'credit'},
         ]},
         { name: 'total', label: 'Total', type: 'decimal'},
         { name: 'tunai', label: 'Terbayar', type: 'decimal'},

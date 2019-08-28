@@ -4,11 +4,22 @@ if (! function_exists('bd_json')) {
   function bd_json($data, $additionalData = []) {
     $json = [];
     $paginate = request('paginate');
+    $sortBy = request('sortBy');
+    $descending = request('descending');
     if ($data !== null) {
       if (is_array($data)) {
         return jsend_success($data);
       }
       if (get_class($data) === "Illuminate\\Database\\Eloquent\\Builder" || get_class($data) === "Illuminate\\Database\\Query\\Builder") {
+        if ($sortBy != null) {
+          if ($descending == null) {
+            $descending = false;
+          }
+          if ($descending === true || $descending === 'true')
+            $data = $data->orderBy($sortBy,'desc');
+          else
+            $data = $data->orderBy($sortBy,'asc');
+        }
         if ($paginate != null && is_numeric($paginate)) {
           $data = $data->paginate($paginate);
         } else {

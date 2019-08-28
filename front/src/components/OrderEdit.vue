@@ -19,7 +19,7 @@
             </template>
             Mengubah/Menghapus order akan menghapus semua kredit yang telah dilakukan (jika metode pembayaran kredit)
           </q-banner>
-          <q-btn v-show="!editMode" :disabled="nilaiTunai >= table.grandTotal" label="BAYAR KREDIT" color="info" icon="attach_money" @click="kredit.dialog = true"/>
+          <q-btn v-show="!editMode" :disabled="nilaiTunai >= table.grandTotal" label="BAYAR KREDIT" :color="nilaiTunai >= table.grandTotal ? 'grey' : 'lime'" icon="attach_money" @click="kredit.dialog = true"/>
           <q-btn v-show="!editMode" label="EDIT / HAPUS ORDER" color="warning" icon="edit" @click="editMode = true"/>
         </div>
 

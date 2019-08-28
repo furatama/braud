@@ -11,6 +11,7 @@
     fill-input
     @filter="(val, update) => {urlAPI ? filterDS(val,update) : filterNoDS(val,update)}"
     @input="input"
+    :clearable="clearable"
   >
     <template v-slot:no-option>
       <q-item>
@@ -33,6 +34,7 @@ export default {
     label: String,
     urlAPI: String,
     outlined: Boolean,
+    clearable: Boolean,
     options: Array,
     value: [Number,String,Object]
   },
@@ -81,35 +83,39 @@ export default {
     },
 
     input(val) {
+      // console.log('input',val)
       this.$emit('input',val)
     },
   },
   watch: {
     options(val) {
+      // console.log('options',val)
       this.defaultOptions = [...this.options]
       this.model = this.options.find((el) => {
         // if (el.value == this.value) {
-        //   console.log(el.value,this.value)
+          // console.log(el.value,this.value)
         // }
         return el.value == this.value
       })
     },
     value(val) {
-      console.log('value',val)
+      // console.log('value',val)
       this.model = val
     },
     model(val) {
+      // console.log('model',val)
       if (!isNaN(val)) {
+        // console.log('a',this.value)
         this.model = this.options.find((el) => {
           return el.value == this.value
         })
+        // console.log('a',this.model)
       }
     }
   },
   mounted() {
     if (this.options) {
       this.defaultOptions = [...this.options]
-      // console.log('options',this.options)
       this.model = this.options.find((el) => {
         return el.value == this.value
       })

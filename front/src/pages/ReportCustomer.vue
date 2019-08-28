@@ -4,6 +4,7 @@
       title="Report Customer"
       :columns="columns"
       :resourceURL="link"
+      :addFilters="filters"
     />
   </q-page>
 </template>
@@ -25,8 +26,27 @@ export default {
         { name: 'nilai', label: 'Nilai Order', type: 'decimal'},
         { name: 'terbayar', label: 'Terbayar', type: 'decimal'}
       ],
+      filters: [
+        { name: 'customer', label: 'Customer', type: 'select', options: []},
+      ]
     }
   },
+  mounted() {
+    // setTimeout(() => { 
+      this.$store.dispatch("fetchOptions",{url: '/customer/aktif'})
+        .then((response) => {
+          let data = response.data
+          this.filters[0].options = data.map((v) => {
+            return {
+              label: v.nama,
+              value: v.id
+            }
+          })
+        }).catch((error) => {
+          console.log(error)
+        })
+    // }, 100);
+  }
 }
 </script>
 

@@ -23,9 +23,10 @@
               color="primary"
               label="Filter"
               icon="sort"
+              @show="applyFilter"
               @hide="onRequest"
             >
-              <div class="q-pa-sm">
+              <q-card class="q-pa-sm">
                 <div class="text-h6 q-mb-sm">Jenis Report</div>
                 <div class="">
                   <q-option-group
@@ -67,7 +68,22 @@
                     </template>
                   </q-input>
                 </div>
-              </div>
+
+                <q-separator v-if="aFilters.length > 0" inset class="q-my-sm" />
+
+                <div v-if="aFilters.length > 0" class="text-h6 q-mb-sm">Key Filter</div>
+
+                <div v-for="(filter,ifilter) in aFilters" :key="ifilter">
+                  <div v-if="filter.type == 'text' || !filter.type">
+                    <q-input clearable :label="filter.label" v-model="filter.value" />
+                  </div>
+                  <div v-else-if="filter.type == 'select'">
+                    <select-filter clearable v-model="filter.value" :options="filter.options" map-options :label="filter.label">
+                    </select-filter>
+                  </div>
+                </div>
+
+              </q-card>
             </q-btn-dropdown>
           </div>
         </div>
@@ -77,13 +93,19 @@
 </template>
 
 <script>
+import SelectFilter from './SelectFilter'
+
 export default {
+  components: {
+    'select-filter' : SelectFilter
+  },
   props: {
     title: String,
     columns: Array,
     resourceURL: String,
     inputs: Array,
     doRequest: Function,
+    addFilters: Array,
   },
   data () {
     return {
@@ -92,6 +114,8 @@ export default {
       filterSampai: '',
       rpp: [5,7,9,15,50,100,500],
       pagination: {
+        sortBy: null,
+        descending: false,
         page: 1,
         rowsPerPage: 50,
         rowsNumber: 10,
@@ -99,7 +123,8 @@ export default {
       data: [],
       cols: [],
       dateIndex: 0,
-      titleComputed: this.title
+      titleComputed: this.title,
+      aFilters: []
     }
   },
   computed: {
@@ -114,14 +139,40 @@ export default {
     loading() {
       return this.$store.state.loading
     },
+    pFilters() {
+      return this.aFilters.reduce((acc,v) => {
+        acc[v.name] = v.value && v.value.hasOwnProperty('label') ? v.value.value : v.value
+        return acc
+      }, {})
+    }
+  },
+  watch: {
+    addFilters: {
+      handler(val){
+        let vals = this.aFilters.map(v => v.value)
+        this.aFilters = [...val]
+      },
+      deep: true
+    }
   },
   methods: {
+    applyFilter() {
+      // setTimeout(() => {  
+        this.aFilters.forEach((v,i) => {
+          if (this.pFilters[v.name])
+            this.aFilters[i].value = this.pFilters[v.name]
+        })
+        console.log(this.aFilters)
+      // }, 500);
+    },
     onRequest (props = null) {
+      console.log(props, this.pFilters)
       let pagination = props && props.hasOwnProperty('pagination') ? props.pagination : this.pagination
       let params = {
         method: this.filter,
         from: this.filterDari || null,
         to: this.filterSampai || null,
+        ...this.pFilters
       }
 
       this.$store.dispatch("fetchPaginate",{url: this.resourceURL, pagination, params})
@@ -131,6 +182,8 @@ export default {
           this.pagination.page = tabledata.current_page
           this.pagination.rowsPerPage = tabledata.per_page
           this.pagination.rowsNumber = tabledata.total          
+          this.pagination.sortBy = pagination.sortBy
+          this.pagination.descending = pagination.descending
           this.reformat()
         }).catch((error) => {
           console.log(error)
@@ -211,6 +264,7 @@ export default {
         label: col.label || col.name.toUpperCase(),
         field: col.field || col.name,
         filter: col.filter || (col.type == 'boolean' ? 1 : ''),
+        sortable: col.sortable || true,
         format: (val, row) => {
           if (col.type === 'decimal') {
             return 'Rp ' + this.$numeralCurrency(val)

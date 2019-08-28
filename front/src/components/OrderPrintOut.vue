@@ -11,7 +11,7 @@
           width: ${po.width};
       `">
         <tr style="font-size: 14px;">
-          <td style="vertical-align: top; width:40%; font-weight:bold; font-size: 20px;">
+          <td style="vertical-align: top; width:35%; font-weight:bold; font-size: 20px;">
             <img
               src="~assets/print-logo.jpg"
               style="width:250px;"
@@ -22,7 +22,7 @@
             <span v-if="dats.length > 1">{{index+1}}/{{dats.length}}</span>
             <div style="height:2px"/>
           </td>
-          <td style="vertical-align: bottom; width:25%; text-align:right">
+          <td style="vertical-align: bottom; width:20%; text-align:right">
             <span style="border-bottom: 1px dotted; font-weight: bold;">#{{dat.no}}</span>
             <div style="height:2px"/>
           </td>
@@ -32,19 +32,18 @@
             <div style="
               font-weight:bold;
               font-size: 14px;
-            ">UD. Ladang Roti</div>
-            <div>Jl. Pulau Morotai 45, Denpasar, Bali</div>
+            ">{{po.store.name}}</div>
+            <div>{{po.store.address}}</div>
             <div style="
               font-size: 10px;
-            ">082 237 810 111 / braud.artisanbakery@gmail.com</div>
+            ">{{po.store.phone}} / {{po.store.email}}</div>
           </td>
           <td style="vertical-align: top">
             <div style="
-              font-weight:bold;
               font-size: 14px;
-            ">Cust: {{dat.cust.nama}}</div>
-            <div>{{dat.cust.alamat || '-'}}</div>
-            <div style="
+            ">Cust: <b>{{dat.cust.nama}}</b></div>
+            <div v-if="dat.cust.alamat">{{dat.cust.alamat || '-'}}</div>
+            <div v-if="dat.cust.telepon || dat.cust.email" style="
               font-size: 10px;
             ">{{dat.cust.telepon || '-'}} / {{dat.cust.email || '-'}}</div>
           </td>
@@ -70,16 +69,16 @@
             No
           </td>
           <td style="border-bottom: 1px dotted;border-left: 1px dotted;border-right: 1px dotted" >
-            Produk
+            Product
           </td>
           <td style="border-bottom: 1px dotted;border-left: 1px dotted;border-right: 1px dotted;width:10%; text-align:right">
             Qty
           </td>
           <td style="border-bottom: 1px dotted;border-left: 1px dotted;border-right: 1px dotted;width:15%; text-align:right">
-            Harga
+            Price
           </td>
           <td style="border-bottom: 1px dotted;border-left: 1px dotted;border-right: 1px dotted;width:10%; text-align:right">
-            Diskon
+            Disc
           </td>
           <td style="border-bottom: 1px dotted;border-left: 1px dotted;border-right: 1px dotted;width:15%; text-align:right">
             Subtotal
@@ -104,14 +103,14 @@
         `">
         <div style="display:flex;justify-content: flex-end;">
           <div style="width:15%;margin-right:5px;font-weight:bold">Total : </div>
-          <div style="width:15%;margin-right:5px">{{dat.subPart}}</div>
+          <div style="width:15%;margin-right:5px;">{{dat.subPart}}</div>
         </div>
         <div v-if="dats.length > 1" style="display:flex;justify-content: flex-end;">
-          <div style="width:15%;margin-right:5px;font-weight:bold">Keseluruhan : </div>
+          <div style="width:15%;margin-right:5px;font-weight:bold">Total All : </div>
           <div style="width:15%;margin-right:5px">{{dat.total}}</div>
         </div>
         <div style="display:flex;justify-content: flex-end;">
-          <div style="width:15%;margin-right:5px;font-weight:bold">Metode : </div>
+          <div style="width:15%;margin-right:5px;font-weight:bold">Method : </div>
           <div style="width:15%;margin-right:5px">{{dat.method}}</div>
         </div>
       </div>
@@ -120,19 +119,19 @@
           font-family: ${po.font.three};
           font-size: 14px;
           margin-left: ${po.margin.left};
-          margin-top: ${dats.length > 1 ? '-45px' : '-30px'};
+          margin-top: ${dats.length > 1 ? '-42px' : '-27px'};
           width: ${po.width};
       `">
         <div style="display:flex;">
           <div style="width:150px; margin-left: 10%">
-            <div align="center">Penerima
+            <div align="center">Recipient
             <br/><br/>
-            (________________)</div>
+            (<span style="margin-left:120px"/>)</div>
           </div>
           <div  style="width:150px; margin-left: 10%">
-            <div align="center">Kasir
+            <div align="center">Cashier
             <br/><br/>
-            (________________)</div>
+            (<span style="margin-left:120px"/>)</div>
           </div>
         </div>
       </div>

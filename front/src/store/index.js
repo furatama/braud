@@ -30,9 +30,15 @@ export default function (/* { ssrContext } */) {
           top: LocalStorage.getItem('pmt') || 0,
         },
         font: {
-          one: LocalStorage.getItem('pf1') || "'Draft 17cpi', 'Consolas', Courier, monospace",
-          two: LocalStorage.getItem('pf2') || "'Draft 17cpi', 'Consolas', Courier, monospace",
-          three: LocalStorage.getItem('pf3') || "'Draft 17cpi', 'Consolas', Courier, monospace",
+          one: LocalStorage.getItem('pf1') || "'Century Gothic', serif",
+          two: LocalStorage.getItem('pf2') || "monospace",
+          three: LocalStorage.getItem('pf3') || "'Century Gothic', serif",
+        },
+        store: {
+          name: LocalStorage.getItem('psn') || 'UD. Ladang Roti',
+          address: LocalStorage.getItem('psa') || 'Jl. Pulau Morotai 45, Denpasar, Bali',
+          phone: LocalStorage.getItem('psp') || '082 237 810 111',
+          email: LocalStorage.getItem('pse') || 'braud.artisanbakery@gmail.com'
         },
         width: LocalStorage.getItem('pw') || "90%",
         rows: LocalStorage.getItem('pr') || 12,
@@ -102,8 +108,16 @@ export default function (/* { ssrContext } */) {
         state.printout.width = payload.width
         LocalStorage.set('pw', payload.width)
         state.printout.rows = payload.rows
-        LocalStorage.set('pw', payload.rows)
-        console.log('updated')
+        LocalStorage.set('pr', payload.rows)
+
+        state.printout.store.name = payload.store.name
+        LocalStorage.set('psn', payload.store.name)
+        state.printout.store.address = payload.store.address
+        LocalStorage.set('psa', payload.store.address)
+        state.printout.store.phone = payload.store.phone
+        LocalStorage.set('psp', payload.store.phone)
+        state.printout.store.email = payload.store.email
+        LocalStorage.set('pse', payload.store.email)
       }
 
     },

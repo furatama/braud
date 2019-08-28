@@ -11,7 +11,8 @@ class ReportController extends Controller
         $method = $request->input('method','d');
         $from = $request->input('from',null);
         $to = $request->input('to',null);
-        $data = Report::customer($method,$from,$to);
+        $customer = $request->input('customer',null);
+        $data = Report::customer($method,$from,$to,$customer);
         return bd_json(Report::envelop($data));
     }
 
@@ -19,7 +20,8 @@ class ReportController extends Controller
         $method = $request->input('method','d');
         $from = $request->input('from',null);
         $to = $request->input('to',null);
-        $data = Report::produk($method,$from,$to);
+        $produk = $request->input('produk',null);
+        $data = Report::produk($method,$from,$to,$produk);
         return bd_json(Report::envelop($data));
     }
 

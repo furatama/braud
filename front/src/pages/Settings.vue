@@ -30,6 +30,10 @@
       <q-input outlined v-model="printout.font.three" label="Font Family 3"/>
       <q-input outlined v-model="printout.width" label="Print Width"/>
       <q-input outlined v-model="printout.rows" label="Limit Item Per Nota"/>
+      <q-input outlined v-model="printout.store.name" label="Nama Usaha"/>
+      <q-input outlined v-model="printout.store.address" label="Alamat Usaha"/>
+      <q-input outlined v-model="printout.store.phone" label="Telpon Usaha"/>
+      <q-input outlined v-model="printout.store.email" label="Email Usaha"/>
       <div class="row justify-end">
         <q-btn type="submit" label="Update Printout" color="positive"/>
       </div>
@@ -118,6 +122,12 @@ export default {
         },
         width: this.printout.width,
         rows: this.printout.rows,
+        store: {
+          name: this.printout.store.name,
+          address: this.printout.store.address,
+          phone: this.printout.store.phone,
+          email: this.printout.store.email,
+        },
       })
     }
   },
@@ -125,17 +135,23 @@ export default {
     this.loadInfo()
     this.printout = {
       margin : {
-          left: this.$store.state.printout.margin.left,
-          top: this.$store.state.printout.margin.top,
-        },
-        font : {
-          one: this.$store.state.printout.font.one,
-          two: this.$store.state.printout.font.two,
-          three: this.$store.state.printout.font.three,
-        },
-        width: this.$store.state.printout.width,
-        rows: this.$store.state.printout.rows,
-      }
+        left: this.$store.state.printout.margin.left,
+        top: this.$store.state.printout.margin.top,
+      },
+      font : {
+        one: this.$store.state.printout.font.one,
+        two: this.$store.state.printout.font.two,
+        three: this.$store.state.printout.font.three,
+      },
+      width: this.$store.state.printout.width,
+      rows: this.$store.state.printout.rows,
+      store: {
+        name: this.$store.state.printout.store.name,
+        address: this.$store.state.printout.store.address,
+        phone: this.$store.state.printout.store.phone,
+        email: this.$store.state.printout.store.email,
+      },
+    }
   },
 }
 </script>

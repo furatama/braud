@@ -17,7 +17,7 @@ class Report extends Model
         return DB::table(DB::raw("({$result->toSql()}) tbl"))->addBinding($result->getBindings());
     }
 
-    public static function customer($method,$from,$to) {
+    public static function customer($method,$from,$to,$fCust = null) {
         $order = Order::query();
         $customer = Customer::select('id','nama');
         $detail = Order::select('id',DB::raw('SUM(qty) as qty'),DB::raw('SUM((100-diskon)/100*qty*harga) as nilai'))
@@ -49,12 +49,13 @@ class Report extends Model
         
         if ($from != null) $result = $result->whereDate('tanggal','>=',$from);
         if ($to != null) $result = $result->whereDate('tanggal','<=',$to);
+        if ($fCust != null) $result = $result->where('id_customer',$fCust);
 
         // dd($result->get()->toArray());
         return $result;
     }
 
-    public static function produk($method,$from,$to) {
+    public static function produk($method,$from,$to,$fProd = null) {
         $order = Order::query();
         $produk = Produk::select('id','kode','nama');
         $detail = OrderDetail::select('id_order','id_produk','qty','diskon','harga');
@@ -83,6 +84,7 @@ class Report extends Model
         
         if ($from != null) $result = $result->whereDate('tanggal','>=',$from);
         if ($to != null) $result = $result->whereDate('tanggal','<=',$to);
+        if ($fProd != null) $result = $result->where('id_produk',$fProd);
 
         // dd($result->get()->toArray());
         return $result;
@@ -109,7 +111,10 @@ class Report extends Model
         }
 
         $result = $result->select(DB::raw($tanggal . ' as date'),
-                    DB::raw('COUNT(DISTINCT id_order) as norder'),DB::raw('SUM(qty) as nproduk'),
+                    DB::raw("COUNT(DISTINCT id_order) as norder"),
+                    DB::raw("COUNT(DISTINCT CASE WHEN metode = 'cash' THEN id_order END) as torder"),
+                    DB::raw("COUNT(DISTINCT CASE WHEN metode = 'credit' THEN id_order END) as korder"),
+                    DB::raw('SUM(qty) as nproduk'),
                     DB::raw('SUM((100-diskon)/100*qty*harga) as total')
                 );
         
@@ -199,13 +204,13 @@ class Report extends Model
     public static function excelOrder($method,$from,$to) {
         $reportData = self::envelop(self::order($method,$from,$to));
         if ($method === 'd')
-            $reportData = $reportData->select('date as TANGGAL','norder AS JUMLAH_ORDER','nproduk as JUMLAH_PRODUK','total as NOMINAL');
+            $reportData = $reportData->select('date as TANGGAL','norder AS JUMLAH_ORDER','nproduk as JUMLAH_PRODUK','total as NOMINAL','torder as CASH','korder as CREDIT');
         else if ($method === 'm')
-            $reportData = $reportData->select(DB::raw("DATE_FORMAT(date,'%Y-%m') as BULAN"),'norder AS JUMLAH_ORDER','nproduk as JUMLAH_PRODUK','total as NOMINAL');
+            $reportData = $reportData->select(DB::raw("DATE_FORMAT(date,'%Y-%m') as BULAN"),'norder AS JUMLAH_ORDER','nproduk as JUMLAH_PRODUK','total as NOMINAL','torder as CASH','korder as CREDIT');
         else if ($method === 'y')
-            $reportData = $reportData->select(DB::raw("YEAR(date) as TAHUN"),'norder AS JUMLAH_ORDER','nproduk as JUMLAH_PRODUK','total as NOMINAL');
+            $reportData = $reportData->select(DB::raw("YEAR(date) as TAHUN"),'norder AS JUMLAH_ORDER','nproduk as JUMLAH_PRODUK','total as NOMINAL','torder as CASH','korder as CREDIT');
         else
-            $reportData = $reportData->select('norder AS JUMLAH_ORDER','nproduk as JUMLAH_PRODUK','total as NOMINAL');
+            $reportData = $reportData->select('norder AS JUMLAH_ORDER','nproduk as JUMLAH_PRODUK','total as NOMINAL','torder as CASH','korder as CREDIT');
 
         $reportDataGet = $reportData->get()
             ->map(function ($item, $key) {

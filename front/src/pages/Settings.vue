@@ -110,6 +110,7 @@ export default {
         })
     },
     updatePrintout() {
+      this.$notifyPositive("Berhasil Mengupdate Printout")
       this.$store.commit('setPrintoutSettings', {
         margin : {
           left: this.printout.margin.left,

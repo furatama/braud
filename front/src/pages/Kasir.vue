@@ -287,7 +287,7 @@ export default {
               label: v.nama,
               value: v.id,
               alamat: v.alamat || '',
-              telepon: v.email || '',
+              telepon: v.telepon || '',
               email: v.email || '',
             }
           })

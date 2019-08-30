@@ -3,20 +3,21 @@
     <q-header elevated>
       <q-toolbar class="title-brand">
         <q-btn
-          flat
+          outline
           dense
           round
           @click="leftDrawerOpen = !leftDrawerOpen"
           aria-label="Menu"
+          style="background-color:grey !important"
         >
-          <q-icon name="menu" />
+          <q-icon name="img:statics/app-logo-128x128.png" />
         </q-btn>
 
         <q-toolbar-title>
           Braud Artisan Bakery
         </q-toolbar-title>
 
-        <div>v1.1</div>
+        <div>v1.2</div>
       </q-toolbar>
     </q-header>
 
@@ -137,7 +138,7 @@ export default {
       {
         label: 'Kasir',
         to: '/kasir',
-        icon: 'local_grocery_store',
+        icon: 'store',
         role: ['admin','kasir']
       },
       {

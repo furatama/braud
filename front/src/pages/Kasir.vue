@@ -13,7 +13,16 @@
               </q-icon>
             </template>
           </q-input>
-          <select-filter class="col-8" outlined label="Customer" v-model="order.customer" :options="order.customerOpts" :loading="loading"/>
+          <q-input v-model="order.due" outlined label="Jatuh Tempo (Credit Only)" mask="####/##/##" placeholder="YYYY/MM/DD">
+            <template v-slot:append>
+              <q-icon name="event" class="cursor-pointer">
+                <q-popup-proxy>
+                  <q-date v-model="order.due"/>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+          </q-input>
+          <select-filter class="col-5" outlined label="Customer" v-model="order.customer" :options="order.customerOpts" :loading="loading"/>
         </div>
         <q-separator class="q-my-sm"/>
 
@@ -27,7 +36,7 @@
           no-data-label="Belum Ada Produk"            
         >
           <template v-slot:body="props">
-            <q-tr :props="props">
+            <q-tr :props="props" :style="`background-color:rgba(255,255,0,${props.row.bg})`">
               <q-td v-for="(col) in props.cols" :key="col.name" :props="props">
                 <template v-if="col.name == 'action'">
                   <q-btn icon="clear" color="negative" flat dense @click="() => { table.data.splice(props.row.__index,1); refreshGrandTotal(); }">
@@ -67,8 +76,8 @@
         <div class="row q-mt-sm justify-between">
           <q-btn :disabled="table.data.length <= 0" label="RESET" color="info" icon="refresh" @click="() => {resetForm()}"/>
           <div class="row q-col-gutter-md">
-            <div><q-btn :disabled="table.data.length <= 0" label="CHECKOUT CREDIT" color="light-green" icon="local_grocery_store" @click="addOrder('credit')"/></div>
-            <div><q-btn :disabled="table.data.length <= 0" label="CHECKOUT CASH" color="green" icon="local_grocery_store" @click="addOrder('cash')"/></div>
+            <div class="q-mr-md"><q-btn :disabled="table.data.length <= 0" label="CHECKOUT CREDIT" color="teal" icon="credit_card" @click="addOrder('credit')"/></div>
+            <div><q-btn :disabled="table.data.length <= 0" label="CHECKOUT CASH" color="green" icon="monetization_on" @click="addOrder('cash')"/></div>
           </div>
         </div>
 
@@ -183,6 +192,7 @@ export default {
       order: {
         no: '',
         tanggal: this.$date.formatDate(Date.now(),'YYYY/MM/DD'),
+        due: this.$date.formatDate(this.$date.adjustDate(this.$date.addToDate(new Date(), {month: 1}), {date: 25}),'YYYY/MM/DD'),
         customer: '',
         customerOpts: [],
       },
@@ -245,7 +255,8 @@ export default {
     printData() {
       return {
         no: this.order.no,
-        tanggal: this.$date.formatDate(this.order.tanggal, 'DD/MMMM/YYYY'),
+        tanggal: this.$date.formatDate(this.order.tanggal, 'DD/MM/YYYY'),
+        due: this.$date.formatDate(this.order.due, 'DD/MM/YYYY'),
         kasir: this.$store.getters.getName,
         method: this.payment.method == 'cash' ? "CASH" : "CREDIT",
         cust: {
@@ -302,8 +313,7 @@ export default {
           .then((data) => {
             let n = (Number(data.count) + 1)
             n = n > 999 ? n.toString(36) : n.toString()
-            let tk = this.payment.method == 'cash' ? 'T' : 'K'
-            this.order.no = "BA" + this.$date.formatDate(this.order.tanggal,"YYMMDD") + tk + n.padStart(3,'0')
+            this.order.no = "BA" + this.$date.formatDate(this.order.tanggal,"YYMMDD") + n.padStart(3,'0')
             resolve()
           }).catch((error) => {
             console.log(error)
@@ -330,11 +340,10 @@ export default {
         return v.id == item.id
       })
       if (alreadyRow) {
-        alreadyRow.qty += Number(1)
+        alreadyRow.qty = Number(alreadyRow.qty) + Number(1)
         this.refreshSubtotal(alreadyRow)
-        // console.log(alreadyRow)
       } else {
-        this.table.data.push({
+        let alreadyRow = this.table.data.push({
           id: item.id,
           kode: item.kode,
           produk: item.nama,
@@ -344,9 +353,14 @@ export default {
           hargaN: item.harga,
           subtotal: this.$numeralCurrency(item.harga),
           subtotalN: item.harga,
+          bg: 0
         })
         this.refreshGrandTotal()
       }
+      alreadyRow.bg = 0.15
+      setTimeout(function() { 
+        alreadyRow.bg = 0
+      }, 100);
     },
     refreshSubtotal(row) {
       let subtotal = ((100 - row.diskon) / 100) * row.hargaN * row.qty
@@ -376,6 +390,7 @@ export default {
         id_customer: this.customerData.value,
         metode: this.payment.method,
         tanggal: this.orderDate,
+        due: this.order.due,
         faktur: '',
         tunai: this.payment.paid,
         total: this.table.grandTotal,

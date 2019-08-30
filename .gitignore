@@ -13,5 +13,5 @@ yarn-error.log
 
 
 /program
-braud.sql
-braud.zip
+*.sql
+*.zip

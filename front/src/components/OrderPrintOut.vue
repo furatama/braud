@@ -11,24 +11,23 @@
           width: ${po.width};
       `">
         <tr style="font-size: 14px;">
-          <td style="vertical-align: top; width:35%; font-weight:bold; font-size: 20px;">
+          <td style="vertical-align: top; font-weight:bold; font-size: 20px;" colspan="2">
             <img
               src="~assets/print-logo.jpg"
-              style="width:250px;"
+              style="width:100px;"
             >
+            ARTISAN BAKERY
             <div style="height:2px"/>
-          </td>
-          <td style="vertical-align: bottom; text-align:center"  >
             <span v-if="dats.length > 1">{{index+1}}/{{dats.length}}</span>
             <div style="height:2px"/>
           </td>
-          <td style="vertical-align: bottom; width:20%; text-align:right">
+          <td style="vertical-align: bottom; width:105px; text-align:right">
             <span style="border-bottom: 1px dotted; font-weight: bold;">#{{dat.no}}</span>
             <div style="height:2px"/>
           </td>
         </tr>
         <tr>
-          <td style="vertical-align: top">
+          <td style="vertical-align: top; width:245px;">
             <div style="
               font-weight:bold;
               font-size: 14px;
@@ -48,8 +47,9 @@
             ">{{dat.cust.telepon || '-'}} / {{dat.cust.email || '-'}}</div>
           </td>
           <td style="vertical-align: top; text-align:right">
-            <div>{{dat.tanggal}}</div>
-            <div>Staff: {{dat.kasir}}</div>
+            <div style="font-size:10px">Odr@ <span style="font-weight:bold;font-size:12px">{{dat.tanggal}}</span></div>
+            <div style="font-size:10px" v-if="dat.method != 'CASH'">Due@ <span style="font-weight:bold;font-size:12px">{{dat.due}}</span></div>
+            <div style="font-size:10px">Staff: {{dat.kasir}}</div>
           </td>
         </tr>
       </table>
@@ -60,7 +60,7 @@
           font-family: ${po.font.two};
           font-size: 12px;
           margin-left: ${po.margin.left};
-          margin-top: ${po.margin.top};
+          margin-top: 2px;
           width: ${po.width};
           border: 0.5px dotted;
       `">
@@ -75,13 +75,13 @@
             Qty
           </td>
           <td style="border-bottom: 1px dotted;border-left: 1px dotted;border-right: 1px dotted;width:15%; text-align:right">
-            Price
+            Price (Rp)
           </td>
           <td style="border-bottom: 1px dotted;border-left: 1px dotted;border-right: 1px dotted;width:10%; text-align:right">
             Disc
           </td>
           <td style="border-bottom: 1px dotted;border-left: 1px dotted;border-right: 1px dotted;width:15%; text-align:right">
-            Subtotal
+            Subtotal (Rp)
           </td>
         </tr>
         <tr v-for="(item,n) in dat.data">
@@ -98,16 +98,16 @@
           font-family: ${po.font.two};
           font-size: 12px;
           margin-left: ${po.margin.left};
-          margin-top: ${po.margin.top};
+          margin-top: 2px;
           width: ${po.width};
         `">
         <div style="display:flex;justify-content: flex-end;">
-          <div style="width:15%;margin-right:5px;font-weight:bold">Total : </div>
-          <div style="width:15%;margin-right:5px;">{{dat.subPart}}</div>
+          <div style="width:15%;margin-right:5px;font-weight:bold">Total (Rp) : </div>
+          <div style="width:15%;margin-right:5px;font-weight:bold">{{dat.subPart}}</div>
         </div>
         <div v-if="dats.length > 1" style="display:flex;justify-content: flex-end;">
-          <div style="width:15%;margin-right:5px;font-weight:bold">Total All : </div>
-          <div style="width:15%;margin-right:5px">{{dat.total}}</div>
+          <div style="width:15%;margin-right:5px;font-weight:bold">Total All (Rp) : </div>
+          <div style="width:15%;margin-right:5px;font-weight:bold">{{dat.total}}</div>
         </div>
         <div style="display:flex;justify-content: flex-end;">
           <div style="width:15%;margin-right:5px;font-weight:bold">Method : </div>
@@ -135,7 +135,7 @@
           </div>
         </div>
       </div>
-      <br style="margin-bottom:10px" v-if="index + 1 < dats.length"/>
+      <br style="margin-bottom:50px" v-if="index + 1 < dats.length"/>
     </div>
   </div>
 </template>
@@ -168,7 +168,6 @@ export default {
           data: as,
           subPart: this.$numeralCurrency(
               as.reduce((acc,v) => {
-                console.log(v)
                 return acc + Number(this.$numeralVal(v.subtotal))
               },0
             )

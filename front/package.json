@@ -11,9 +11,10 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
+    "@seregpie/vuetween": "^18.10.25",
     "axios": "^0.18.1",
-    "quasar": "^1.0.5",
     "numeral": "^2.0.6",
+    "quasar": "^1.0.5",
     "vue-html-to-paper": "^1.1.0"
   },
   "devDependencies": {

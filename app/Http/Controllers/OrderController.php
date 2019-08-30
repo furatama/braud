@@ -13,6 +13,7 @@ class OrderController extends Controller
         $data = Order::listing();
         $data = $data->searchAllFields();
         // dd($data->toSql());
+        
         return bd_json($data);
     }
 
@@ -88,7 +89,7 @@ class OrderController extends Controller
     public function numOrder(Request $request) {
         $date = $request->tanggal;
         $metode = $request->metode;
-        $data = \DB::table('order')->whereDate('tanggal',$date)->where('metode',$metode)->count();
+        $data = \DB::table('order')->whereDate('tanggal',$date)->count();
         return bd_json(["count" => $data]);
     }
 

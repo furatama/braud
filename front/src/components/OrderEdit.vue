@@ -4,11 +4,15 @@
       <div class="col-12">
         <div class="row justify-between">
           <div>No Order: <br/>{{data.no}}</div>
-          <div>Tanggal Order: <br/>{{$date.formatDate(data.tanggal,'DD/MMMM/YYYY')}}</div>
           <div>Customer: <br/>{{data.customer}}</div>
-          <div>Metode: <br/>{{data.metode == 'cash' ? 'Tunai' : 'Kredit'}}</div>
-          <div>Terbayar: <br/>{{$numeralCurrency(nilaiTunai)}}</div>
-          <div>Status: <br/>{{nilaiTunai >= table.grandTotal ? 'Lunas' : 'Belum Lunas'}}</div>
+          <div>Tanggal Order: <br/>{{$date.formatDate(data.tanggal,'DD/MMMM/YYYY')}}</div>
+          <div>Jatuh Tempo: <br/>{{$date.formatDate(data.due,'DD/MMMM/YYYY')}}</div>
+          <div>Metode: <br/>{{data.metode == 'cash' ? 'Cash' : 'Credit'}}</div>
+          <div>Terbayar: <br/>{{$numeralCurrency(data.tunai)}}</div>
+          <div>Status: <br/>{{
+            ($numeralVal(data.tunai) >= $numeralVal(data.total) ? 'Lunas' : 
+            ($date.getDateDiff(new Date(), data.due) > 0 ? 'Jatuh Tempo' : 'Belum Lunas'))
+          }}</div>
         </div>
         <q-separator class="q-my-sm"/>
 
@@ -21,6 +25,34 @@
           </q-banner>
           <q-btn v-show="!editMode" :disabled="nilaiTunai >= table.grandTotal" label="BAYAR KREDIT" :color="nilaiTunai >= table.grandTotal ? 'grey' : 'lime'" icon="attach_money" @click="kredit.dialog = true"/>
           <q-btn v-show="!editMode" label="EDIT / HAPUS ORDER" color="warning" icon="edit" @click="editMode = true"/>
+        </div>
+
+        <div v-if="editMode" class="row q-gutter-lg q-mb-sm">
+          <div class="col-3">
+            <q-input dense v-model="orderData.tanggal" outlined label="Tanggal Order" mask="####/##/##" placeholder="YYYY/MM/DD">
+              <template v-slot:append>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy>
+                    <q-date v-model="orderData.tanggal"/>
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+          </div>
+          <div class="col-3">
+            <q-input dense v-model="orderData.due" outlined label="Jatuh Tempo (Credit Only)" mask="####/##/##" placeholder="YYYY/MM/DD">
+              <template v-slot:append>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy>
+                    <q-date v-model="orderData.due"/>
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+          </div>
+          <div class="col-3">
+            <q-select map-options dense outlined label="Metode Pembayaran" v-model="orderData.metode" :options="metodeOpts"/>
+          </div>
         </div>
 
         <q-table
@@ -89,7 +121,10 @@
             </q-popup-proxy>
           </q-btn>
 
-          <q-btn :disabled="table.data.length <= 0" :label="editMode ? 'SIMPAN & CETAK NOTA' : 'CETAK NOTA'" color="positive" icon="print" @click="onSubmit"/>
+          <div class="row">
+            <q-btn v-show="editMode" class="q-mr-md" label="SIMPAN" color="positive" icon="save" @click="onSubmit(false)"/>
+            <q-btn :disabled="table.data.length <= 0" :label="editMode ? 'SIMPAN & CETAK NOTA' : 'CETAK NOTA'" color="positive" icon="print" @click="onSubmit"/>
+          </div>
         </div>
 
       </div>
@@ -193,6 +228,7 @@ export default {
       produkData: [],
       defProdukData: [],
       customerData: {},
+      orderData: [],
       filter: '',
       checkout: {
         isShow: false,
@@ -204,10 +240,17 @@ export default {
           {label: 'Tunai', value: 'cash'},
           {label: 'Kredit', value: 'credit'},
         ],
-      }
+      },
+      metodeOpts: [
+        {label: "Cash", value: "cash"},
+        {label: "Credit", value: "credit"},
+      ]
     }
   },
   computed: {
+    tanggalOrder() {
+      return this.orderData.tanggal
+    },
     nilaiTunai() {
       return this.data.metode == 'cash' ? this.table.grandTotal : this.data.tunai
     },
@@ -235,12 +278,14 @@ export default {
       return paid - total
     },
     printData() {
+      this.orderData.metode = this.orderData.hasOwnProperty('metode') ? (this.orderData.metode.hasOwnProperty('value') ? this.orderData.metode.value : this.orderData.metode) : 'cash'
       return {
-        id_order: this.data.id,
-        no: this.data.no,
-        tanggal: this.$date.formatDate(this.data.tanggal, 'DD/MMMM/YYYY'),
+        id_order: this.orderData.id,
+        no: this.orderData.no,
+        tanggal: this.$date.formatDate(this.orderData.tanggal, 'DD/MM/YYYY'),
+        due: this.$date.formatDate(this.orderData.due, 'DD/MM/YYYY'),
         kasir: this.$store.getters.getName,
-        method: this.data.metode == 'cash' ? "TUNAI" : "KREDIT",
+        method: this.orderData.metode == 'cash' ? "CASH" : "CREDIT",
         cust: {
           nama: this.customerData.nama,
           email: this.customerData.email,
@@ -248,10 +293,10 @@ export default {
           telepon: this.customerData.telepon,
         },
         total: this.$numeralCurrency(this.table.grandTotal),
-        tunaiLabel: this.data.metode == 'cash' ? "Terbayar" : "Kredit",
-        tunai: this.$numeralCurrency(this.data.tunai),
-        sisaLabel: this.data.metode == 'cash' ? "Kembalian" : "Hutang",
-        sisa: this.data.metode == 'cash' ? this.$numeralCurrency(this.exchange) : this.$numeralCurrency(-this.exchange),
+        tunaiLabel: this.orderData.metode == 'cash' ? "Terbayar" : "Kredit",
+        tunai: this.$numeralCurrency(this.orderData.tunai),
+        sisaLabel: this.orderData.metode == 'cash' ? "Kembalian" : "Hutang",
+        sisa: this.orderData.metode == 'cash' ? this.$numeralCurrency(this.exchange) : this.$numeralCurrency(-this.exchange),
         data: this.table.data.map((v) => {
           return {
             ...v, produk: v.id_produk.label || v.produk
@@ -267,6 +312,21 @@ export default {
       }
       if (isNaN(newV)) {
         this.kredit.paid = oldV
+      }
+    },
+    tanggalOrder(newV,oldV) {
+      if (!this.$date.isSameDate(newV, this.$date.formatDate(this.data.tanggal,"YYYY/MM/DD"))) {
+      //   this.$store.dispatch("fetch",{url: `/order/num`, params: {tanggal: newV, metode: this.payment.method}})
+      //     .then((data) => {
+      //       let n = (Number(data.count) + 1)
+      //       n = n > 999 ? n.toString(36) : n.toString()
+      //       this.orderData.no = "BA" + this.$date.formatDate(newV,"YYMMDD") + n.padStart(3,'0') + 'e'
+      //     }).catch((error) => {
+      //       console.log(error)
+      //       this.$notifyNegative("Gagal Mengambil Data No Order")
+      //     })
+      // } else {
+        this.orderData.no = this.data.no + 'e'
       }
     }
   },
@@ -321,7 +381,6 @@ export default {
               subtotalN: subtotal,
             }
           })
-          console.log(this.table.data)
           this.refreshGrandTotal()
         }).catch((error) => {
           console.log(error)
@@ -370,15 +429,17 @@ export default {
       else
         this.kredit.paid += Number(amount)
     },
-    onSubmit() {
+    onSubmit(doPrint = true) {
       if (this.editMode) {
+        this.orderData.metode = this.orderData.metode.hasOwnProperty('value') ? this.orderData.metode.value : this.orderData.metode
         let inputs = {
-          no: this.data.no,
-          id_customer: this.data.id_customer,
-          metode: this.data.metode,
-          tanggal: this.data.tanggal,
+          no: this.orderData.no,
+          id_customer: this.orderData.id_customer,
+          metode: this.orderData.metode,
+          tanggal: this.orderData.tanggal,
+          due: this.orderData.due,
           faktur: '',
-          tunai: this.data.metode == 'cash' ? this.table.grandTotal : 0,
+          tunai: this.orderData.metode == 'cash' ? this.table.grandTotal : 0,
           keterangan: '',
           detail: this.table.data.map((v) => {
             return {
@@ -398,7 +459,8 @@ export default {
             this.$notifyNegative("Gagal Mengupdate Order")
           })
       }
-      this.printOrder()
+      if (doPrint)
+        this.printOrder()
     },
     submitKredit() {
       let inputs = {
@@ -422,6 +484,11 @@ export default {
   mounted() {
     // this.loadNoOrder()
     setTimeout(() => {
+      this.orderData = {
+        ...this.data,
+        tanggal: this.$date.formatDate(this.data.tanggal,"YYYY/MM/DD"),
+        due: this.$date.formatDate(this.data.due,"YYYY/MM/DD")
+      }
       this.loadCustomer()
       this.loadDetail()
       this.loadProduk()

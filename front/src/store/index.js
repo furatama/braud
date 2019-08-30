@@ -26,12 +26,12 @@ export default function (/* { ssrContext } */) {
       },
       printout: {
         margin: {
-          left: LocalStorage.getItem('pml') || 0,
-          top: LocalStorage.getItem('pmt') || 0,
+          left: LocalStorage.getItem('pml') || '5px',
+          top: LocalStorage.getItem('pmt') || '16px',
         },
         font: {
           one: LocalStorage.getItem('pf1') || "'Century Gothic', serif",
-          two: LocalStorage.getItem('pf2') || "monospace",
+          two: LocalStorage.getItem('pf2') || "'Century Gothic', monospace",
           three: LocalStorage.getItem('pf3') || "'Century Gothic', serif",
         },
         store: {
@@ -40,8 +40,8 @@ export default function (/* { ssrContext } */) {
           phone: LocalStorage.getItem('psp') || '082 237 810 111',
           email: LocalStorage.getItem('pse') || 'braud.artisanbakery@gmail.com'
         },
-        width: LocalStorage.getItem('pw') || "90%",
-        rows: LocalStorage.getItem('pr') || 12,
+        width: LocalStorage.getItem('pw') || "80%",
+        rows: LocalStorage.getItem('pr') || 20,
       },
       loading: false
     },

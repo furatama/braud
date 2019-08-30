@@ -31,8 +31,8 @@ export default {
         ]},
         { name: 'total', label: 'Total', type: 'decimal'},
         { name: 'tunai', label: 'Terbayar', type: 'decimal'},
-        { name: 'lunas', label: 'Lunas?', type: 'enum', options: [
-          {label: 'Lunas', value: 1},{label: 'Belum', value: 0},
+        { name: 'lunas', label: 'Status', type: 'enum', options: [
+          {label: 'Lunas', value: 1},{label: 'Belum', value: 0},{label: 'J.Tmpo', value: 2},
         ]},
         { name: 'edit', label: 'Detail Order', type: 'dialog', component: () => import('../components/OrderEdit.vue') },
       ],

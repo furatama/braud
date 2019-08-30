@@ -37,7 +37,7 @@ export default function (/* { ssrContext } */) {
         store: {
           name: LocalStorage.getItem('psn') || 'UD. Ladang Roti',
           address: LocalStorage.getItem('psa') || 'Jl. Pulau Morotai 45, Denpasar, Bali',
-          phone: LocalStorage.getItem('psp') || '082 237 810 111',
+          phone: LocalStorage.getItem('psp') || '+6282 237 810 111',
           email: LocalStorage.getItem('pse') || 'braud.artisanbakery@gmail.com'
         },
         width: LocalStorage.getItem('pw') || "80%",

@@ -21,13 +21,16 @@
             <span v-if="dats.length > 1">{{index+1}}/{{dats.length}}</span>
             <div style="height:2px"/>
           </td>
-          <td style="vertical-align: bottom; width:105px; text-align:right">
-            <span style="border-bottom: 1px dotted; font-weight: bold;">#{{dat.no}}</span>
-            <div style="height:2px"/>
+          <td style="vertical-align: middle; width:105px; text-align:right" rowspan="2">
+            <div style="font-size: 12px;">Invoice No:</div>
+            <div style="font-size: 15px;font-weight: bold;">{{dat.no}}</div>
+            <div style="margin:5px 0"/>
+            <div style="font-size: 12px;">Invoice Date:</div>
+            <div style="font-size: 12px;font-weight: bold;">{{dat.tanggal}}</div>
           </td>
         </tr>
         <tr>
-          <td style="vertical-align: top; width:245px;">
+          <td style="vertical-align: top; width:220px;">
             <div style="
               font-weight:bold;
               font-size: 14px;
@@ -35,7 +38,10 @@
             <div>{{po.store.address}}</div>
             <div style="
               font-size: 10px;
-            ">{{po.store.phone}} / {{po.store.email}}</div>
+            ">{{po.store.phone}}</div>
+            <div style="
+              font-size: 10px;
+            ">{{po.store.email}}</div>
           </td>
           <td style="vertical-align: top">
             <div style="
@@ -45,11 +51,6 @@
             <div v-if="dat.cust.telepon || dat.cust.email" style="
               font-size: 10px;
             ">{{dat.cust.telepon || '-'}} / {{dat.cust.email || '-'}}</div>
-          </td>
-          <td style="vertical-align: top; text-align:right">
-            <div style="font-size:10px">Odr@ <span style="font-weight:bold;font-size:12px">{{dat.tanggal}}</span></div>
-            <div style="font-size:10px" v-if="dat.method != 'CASH'">Due@ <span style="font-weight:bold;font-size:12px">{{dat.due}}</span></div>
-            <div style="font-size:10px">Staff: {{dat.kasir}}</div>
           </td>
         </tr>
       </table>
@@ -110,8 +111,12 @@
           <div style="width:15%;margin-right:5px;font-weight:bold">{{dat.total}}</div>
         </div>
         <div style="display:flex;justify-content: flex-end;">
-          <div style="width:15%;margin-right:5px;font-weight:bold">Method : </div>
+          <div style="width:15%;margin-right:5px;font-weight:bold">Payment : </div>
           <div style="width:15%;margin-right:5px">{{dat.method}}</div>
+        </div>
+        <div v-if="dat.method == 'CREDIT'" style="display:flex;justify-content: flex-end;">
+          <div style="width:15%;margin-right:5px;font-weight:bold">Due : </div>
+          <div style="width:15%;margin-right:5px;font-weight:bold">{{dat.due}}</div>
         </div>
       </div>
       <div 
@@ -119,7 +124,7 @@
           font-family: ${po.font.three};
           font-size: 14px;
           margin-left: ${po.margin.left};
-          margin-top: ${dats.length > 1 ? '-42px' : '-27px'};
+          margin-top: ${dat.method == 'CREDIT' ? '-42px' : '-27px'};
           width: ${po.width};
       `">
         <div style="display:flex;">

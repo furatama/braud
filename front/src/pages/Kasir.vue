@@ -49,7 +49,7 @@
                   <q-input @input="refreshSubtotal(table.data[props.row.__index])" type="number" dense v-model="table.data[props.row.__index][col.name]" input-class="text-right" style="width:40px;float:right"/>
                 </template>
                 <template v-else-if="col.name == 'diskon'">
-                  <q-input min="0" max="100" step="5" @input="refreshSubtotal(table.data[props.row.__index])" type="number" dense v-model="table.data[props.row.__index][col.name]" input-class="text-right" style="width:50px;float:right">
+                  <q-input min="0" max="100" @input="refreshSubtotal(table.data[props.row.__index])" type="number" dense v-model="table.data[props.row.__index][col.name]" input-class="text-right" style="width:50px;float:right">
                     <template v-slot:after>
                       <span class="text-body2">%</span>
                     </template>
@@ -192,7 +192,7 @@ export default {
       order: {
         no: '',
         tanggal: this.$date.formatDate(Date.now(),'YYYY/MM/DD'),
-        due: this.$date.formatDate(this.$date.adjustDate(this.$date.addToDate(new Date(), {month: 1}), {date: 25}),'YYYY/MM/DD'),
+        due: this.$date.formatDate(this.$date.adjustDate(this.$date.addToDate(new Date(), {month: 1}), {date: 20}),'YYYY/MM/DD'),
         customer: '',
         customerOpts: [],
       },

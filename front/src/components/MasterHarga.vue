@@ -9,7 +9,7 @@
       <div class="col-6 row q-col-gutter-md" v-for="(row,index) in listHarga" :key="index">
         <div class="q-mt-md"><q-avatar size="20px" class="q-ma-none q-pa-none text-anti-primary" color="primary">{{index+1}}</q-avatar></div>
         <div><select-filter label="Nama Produk" v-model="row.produk" :options="produkOpts" style="width:225px"/></div>
-        <div><q-input type="number" step="500" label="Harga" v-model="row.harga" style="width:80px" input-class="text-right"/></div>
+        <div><q-input type="number" label="Harga" v-model="row.harga" style="width:80px" input-class="text-right"/></div>
         <div class="q-mt-md">
           <q-btn flat dense icon="delete" color="negative" @click="removeHarga(index)"/>
         </div>

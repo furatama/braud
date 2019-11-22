@@ -26,7 +26,7 @@ if (! function_exists('bd_json')) {
           $data = $data->get();
         }
       } 
-      if (get_class($data) === "Illuminate\\Database\\Eloquent\\Collection" || get_class($data) === "Illuminate\\Pagination\\LengthAwarePaginator" || $data instanceof Illuminate\Database\Eloquent\Model) {  
+      if (get_class($data) === "Illuminate\\Database\\Eloquent\\Collection" || get_class($data) === "Illuminate\\Support\\Collection" || get_class($data) === "Illuminate\\Pagination\\LengthAwarePaginator" || $data instanceof Illuminate\Database\Eloquent\Model) {  
         foreach ($additionalData as $key => $value) {
           $json[$key] = $value;
         }
@@ -45,6 +45,9 @@ if (! function_exists('bd_json')) {
 if (! function_exists('tgl_indo')) {
 
   function tgl_indo($tanggal){
+    if (!$tanggal)
+      return '';
+
     $bulan = array (
         1 =>   'Januari',
         'Februari',
@@ -64,7 +67,7 @@ if (! function_exists('tgl_indo')) {
     if (count($pecahkan) == 1) {
         $pecahkan = explode('/', $tanggal);
     }
-    return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];
+    return substr($pecahkan[2],0,2) . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];
   }
     
 }

@@ -32,4 +32,6 @@ export default async ({Vue}) => {
     const needle = val.toLowerCase()
     return arr.filter(v => v[label].toLowerCase().indexOf(needle) > -1)
   }
+
+  Vue.prototype.$newline_to_br = (string) => string.replace(/(?:\r\n|\r|\n)/g, ' <br/> ')
 }

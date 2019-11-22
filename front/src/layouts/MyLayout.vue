@@ -17,7 +17,7 @@
           Braud Artisan Bakery
         </q-toolbar-title>
 
-        <div>v1.2</div>
+        <div>v1.4</div>
       </q-toolbar>
     </q-header>
 
@@ -145,6 +145,12 @@ export default {
         label: 'Order',
         to: '/order',
         icon: 'list_alt',
+        role: ['admin','kasir']
+      },      
+      {
+        label: 'Invoice',
+        to: '/invoice',
+        icon: 'insert_drive_file',
         role: ['admin','kasir']
       },
       {

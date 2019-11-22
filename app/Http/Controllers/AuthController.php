@@ -77,8 +77,6 @@ class AuthController extends Controller
         return auth()->payload();
     }
 
-    
-
     public function updateInfo()
     {
         $data = auth()->user()->record([

@@ -17,6 +17,15 @@ class OrderController extends Controller
         return bd_json($data);
     }
 
+    public function indexCust($id_cust)
+    {
+        $data = Order::custListing($id_cust);
+        $data = $data->searchAllFields();
+        // dd($data->toSql());
+        
+        return bd_json($data);
+    }
+
     public function store(Request $request)
     {
         $request->request->add(["id_user" => auth()->user()->id]);

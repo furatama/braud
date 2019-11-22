@@ -37,7 +37,7 @@
         >
           <template v-slot:body="props">
             <q-tr :props="props" :style="`background-color:rgba(255,255,0,${props.row.bg})`">
-              <q-td v-for="(col) in props.cols" :key="col.name" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :props="props">
                 <template v-if="col.name == 'action'">
                   <q-btn icon="clear" color="negative" flat dense @click="() => { table.data.splice(props.row.__index,1); refreshGrandTotal(); }">
                   </q-btn>
@@ -46,10 +46,10 @@
                   <q-avatar size="24px" class="text-white" color="primary">{{props.row.__index+1}}</q-avatar>
                 </template>
                 <template v-else-if="col.name == 'qty'">
-                  <q-input @input="refreshSubtotal(table.data[props.row.__index])" type="number" dense v-model="table.data[props.row.__index][col.name]" input-class="text-right" style="width:40px;float:right"/>
+                  <q-input ref="qty" @focus="selectAll" @input="refreshSubtotal(table.data[props.row.__index])" type="number" dense v-model="table.data[props.row.__index][col.name]" input-class="text-right" style="width:40px;float:right"/>
                 </template>
                 <template v-else-if="col.name == 'diskon'">
-                  <q-input min="0" max="100" @input="refreshSubtotal(table.data[props.row.__index])" type="number" dense v-model="table.data[props.row.__index][col.name]" input-class="text-right" style="width:50px;float:right">
+                  <q-input @focus="selectAll" min="0" max="100" @input="refreshSubtotal(table.data[props.row.__index])" type="number" dense v-model="table.data[props.row.__index][col.name]" input-class="text-right" style="width:50px;float:right">
                     <template v-slot:after>
                       <span class="text-body2">%</span>
                     </template>
@@ -99,12 +99,14 @@
             </q-item>
 
             <q-scroll-area style="height:80vh">
-              <q-item  v-for="(data,index) in produkData" clickable v-ripple :key="index" @click="selectSearchedItem(data)">
-                <q-item-section>
+              <q-item  v-for="(data,index) in produkData" clickable v-ripple :key="index" class="q-pa-none">
+                <q-item-section @click="selectSearchedItem(data)" class="q-pl-sm q-py-sm">
                   <q-item-label>{{data.nama}}</q-item-label>
-                  <q-item-label caption>{{data.kode}}</q-item-label>
+                  <q-item-label caption>{{`Rp ${$numeral(data.harga).format('0,0')}`}}</q-item-label>
                 </q-item-section>
-                <q-item-section side>{{`Rp ${$numeral(data.harga).format('0,0')}`}}</q-item-section>
+                <q-item-section side>
+                  <q-btn color="secondary" label="+5" @click="selectSearchedItem(data,5)"/>
+                </q-item-section>
               </q-item>
 
             <q-inner-loading :showing="loading">
@@ -289,6 +291,10 @@ export default {
     }
   },
   methods: {
+    selectAll(evt) {
+      evt.target.select()
+      // console.log(evt)
+    },
     loadCustomer() {
       this.$store.dispatch("fetchOptions",{url: '/customer/aktif'})
         .then((response) => {
@@ -335,30 +341,35 @@ export default {
           this.$notifyNegative("Gagal Mengambil Data Produk")
         })
     },
-    selectSearchedItem(item) {
-      let alreadyRow = this.table.data.find((v) => {
+    selectSearchedItem(item,add = 1) {
+      let refs = this.$refs
+      let row = 0
+      let alreadyRow = this.table.data.find((v,i) => {
+        row = i
         return v.id == item.id
       })
       if (alreadyRow) {
-        alreadyRow.qty = Number(alreadyRow.qty) + Number(1)
+        alreadyRow.qty = Number(alreadyRow.qty) + Number(add)
         this.refreshSubtotal(alreadyRow)
       } else {
-        let alreadyRow = this.table.data.push({
+        alreadyRow = {
           id: item.id,
           kode: item.kode,
           produk: item.nama,
-          qty: 1,
+          qty: add,
           diskon: 0,
           harga: this.$numeralCurrency(item.harga),
           hargaN: item.harga,
           subtotal: this.$numeralCurrency(item.harga),
           subtotalN: item.harga,
           bg: 0
-        })
+        }
+        row = this.table.data.push(alreadyRow) - 1
         this.refreshGrandTotal()
       }
       alreadyRow.bg = 0.15
       setTimeout(function() { 
+        refs['qty'][row].focus()
         alreadyRow.bg = 0
       }, 100);
     },
@@ -409,7 +420,7 @@ export default {
           this.resetForm()
           this.$notifyPositive("Berhasil Memasukkan Order")
         }).catch((error) => {
-          console.log(error)
+          // console.log(error)
           this.$notifyNegative("Gagal Memasukkan Order")
         })
     },
@@ -452,4 +463,16 @@ export default {
 <style lang="stylus">
   .q-table th
     opacity: 1 !important
+
+  .q-item__section--main ~ .q-item__section--side 
+    align-items: flex-end
+    padding-right: 0
+    padding-left: 1px
+  
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin-right: 2px; 
+  }
+
 </style>

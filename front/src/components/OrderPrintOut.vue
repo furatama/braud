@@ -86,12 +86,24 @@
           </td>
         </tr>
         <tr v-for="(item,n) in dat.data">
-          <td style="padding:0 3px;margin:0;height:12px;border-left: 1px dotted;border-right: 1px dotted;vertical-align:top">{{n+1+(index*po.rows)}}</td>
-          <td style="padding:0 3px;margin:0;height:12px;border-left: 1px dotted;border-right: 1px dotted;vertical-align:top">{{item.produk}}</td>
-          <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px dotted;border-right: 1px dotted;vertical-align:top">{{item.qty}}</td>
-          <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px dotted;border-right: 1px dotted;vertical-align:top">{{item.harga}}</td>
-          <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px dotted;border-right: 1px dotted;vertical-align:top">{{item.diskon}}%</td>
-          <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px dotted;border-right: 1px dotted;vertical-align:top">{{item.subtotal}}</td>
+          <td style="padding:0 3px;margin:0;height:12px;border-left: 1px dotted;border-right: 1px dotted;vertical-align:top">
+            <span :style="getStyle(po.styles.num)">{{n+1+(index*po.rows)}}</span>
+          </td>
+          <td style="padding:0 3px;margin:0;height:12px;border-left: 1px dotted;border-right: 1px dotted;vertical-align:top">
+            <span :style="getStyle(po.styles.alp)">{{item.produk}}</span>
+          </td>
+          <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px dotted;border-right: 1px dotted;vertical-align:top">
+            <span :style="getStyle(po.styles.num)">{{item.qty}}</span>
+          </td>
+          <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px dotted;border-right: 1px dotted;vertical-align:top">
+            <span :style="getStyle(po.styles.num)">{{item.harga}}</span>
+          </td>
+          <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px dotted;border-right: 1px dotted;vertical-align:top">
+            <span :style="getStyle(po.styles.num)">{{item.diskon}}%</span>
+          </td>
+          <td style="text-align:right;padding:0 3px;margin:0;height:12px;border-left: 1px dotted;border-right: 1px dotted;vertical-align:top">
+            <span :style="getStyle(po.styles.num)">{{item.subtotal}}</span>
+          </td>
         </tr>
       </table>
       <div  align="right" 
@@ -103,16 +115,16 @@
           width: ${po.width};
         `">
         <div style="display:flex;justify-content: flex-end;">
-          <div style="width:15%;margin-right:5px;font-weight:bold">Total (Rp) : </div>
-          <div style="width:15%;margin-right:5px;font-weight:bold">{{dat.subPart}}</div>
+          <div style="width:15%;margin-right:1px;font-weight:bold">Total (Rp) : </div>
+          <div :style="`${getStyle(po.styles.num)}width:15%;margin-right:4px;font-weight:bold`">{{dat.subPart}}</div>
         </div>
         <div v-if="dats.length > 1" style="display:flex;justify-content: flex-end;">
-          <div style="width:15%;margin-right:5px;font-weight:bold">Total All (Rp) : </div>
-          <div style="width:15%;margin-right:5px;font-weight:bold">{{dat.total}}</div>
+          <div style="width:15%;margin-right:1px;font-weight:bold">Total All (Rp) : </div>
+          <div :style="`${getStyle(po.styles.num)}width:15%;margin-right:4px;font-weight:bold`">{{dat.total}}</div>
         </div>
         <div style="display:flex;justify-content: flex-end;">
-          <div style="width:15%;margin-right:5px;font-weight:bold">Payment : </div>
-          <div style="width:15%;margin-right:5px">{{dat.method}}</div>
+          <div style="width:15%;margin-right:1px;font-weight:bold">Payment : </div>
+          <div style="width:15%;margin-right:4px">{{dat.method}}</div>
         </div>
         <div v-if="dat.method == 'CREDIT'" style="display:flex;justify-content: flex-end;">
           <div style="width:15%;margin-right:5px;font-weight:bold">Due : </div>
@@ -124,9 +136,16 @@
           font-family: ${po.font.three};
           font-size: 14px;
           margin-left: ${po.margin.left};
-          margin-top: ${dat.method == 'CREDIT' ? '-42px' : '-27px'};
+          margin-top: ${dat.method == 'CREDIT' ? '-47px' : '-32px'};
           width: ${po.width};
       `">
+        <div v-if="po.notabene" :style="`
+          font-family: ${po.font.three};
+          font-size: 10.5px;
+          width: 75%;
+        `">
+          <pre>{{po.notabene}} </pre>
+        </div>
         <div style="display:flex;">
           <div style="width:150px; margin-left: 10%">
             <div align="center">Recipient
@@ -182,6 +201,19 @@ export default {
     }
   },
   methods: {
+    getStyle(obj) {
+      let s = ''
+      if (obj.font) {
+        s = s + "font-family:" + obj.font + ";"
+      }
+      if (obj.size) {
+        s = s + "font-size:" + obj.size + ";"
+      }
+      if (obj.bold) {
+        s = s + "font-weight:" + obj.bold + ";"
+      }
+      return s
+    },
     print() {
       // Pass the element id here
       this.doPrint = true;

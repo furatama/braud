@@ -173,6 +173,27 @@ export function postSingle(context, {url, inputs}) {
   })
 }
 
+export function post(context, {url, inputs}) {
+  return new Promise((resolve, reject) => {
+    context.commit("loadingStart")
+    axios.post(url, {
+      ...inputs,
+      token: context.getters.getToken
+    }).then((response) => {
+      const body = response.data
+      if (body.status === "success") {
+        resolve(body.data)
+      } else {
+        reject(response)
+      }
+    }).catch((error) => {
+      reject(error)
+    }).finally(() => {
+      context.commit("loadingEnd")
+    })
+  })
+}
+
 export function updateSingle(context, {url,id,inputs}) {
   return new Promise((resolve, reject) => {
     context.commit("loadingStart")

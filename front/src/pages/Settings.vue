@@ -30,6 +30,19 @@
       <q-input outlined v-model="printout.font.three" label="Font Family 3"/>
       <q-input outlined v-model="printout.width" label="Print Width"/>
       <q-input outlined v-model="printout.rows" label="Limit Item Per Nota"/>
+      <span class="">Item Alphabet : </span>
+      <div class="row q-col-gutter-md">
+        <q-input dense class="col-4" outlined v-model="printout.styles.alp.font" label="Font Fam"/>
+        <q-input dense outlined v-model="printout.styles.alp.size" label="Font Size"/>
+        <q-input dense outlined v-model="printout.styles.alp.bold" label="Bold?"/>
+      </div>
+      <span class="">Item Numeric : </span>
+      <div class="row q-col-gutter-md">
+        <q-input dense class="col-4" outlined v-model="printout.styles.num.font" label="Font Fam"/>
+        <q-input dense outlined v-model="printout.styles.num.size" label="Font Size"/>
+        <q-input dense outlined v-model="printout.styles.num.bold" label="Bold?"/>
+      </div>
+      <q-input autogrow outlined v-model="printout.notabene" label="Nota"/>
       <q-input outlined v-model="printout.store.name" label="Nama Usaha"/>
       <q-input outlined v-model="printout.store.address" label="Alamat Usaha"/>
       <q-input outlined v-model="printout.store.phone" label="Telpon Usaha"/>
@@ -128,7 +141,9 @@ export default {
           address: this.printout.store.address,
           phone: this.printout.store.phone,
           email: this.printout.store.email,
-        },
+        }, 
+        styles: this.printout.styles,
+        notabene: this.printout.notabene,
       })
     }
   },
@@ -152,6 +167,8 @@ export default {
         phone: this.$store.state.printout.store.phone,
         email: this.$store.state.printout.store.email,
       },
+      styles: this.$store.state.printout.styles,
+      notabene: this.$store.state.printout.notabene,
     }
   },
 }

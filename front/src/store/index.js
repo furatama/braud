@@ -42,6 +42,19 @@ export default function (/* { ssrContext } */) {
         },
         width: LocalStorage.getItem('pw') || "80%",
         rows: LocalStorage.getItem('pr') || 20,
+        styles: LocalStorage.getItem('ps') || {
+          alp: {
+            font: "'Century Gothic', monospace",
+            size: "12px",
+            bold: "100",
+          },
+          num: {
+            font: "'B612 Mono', monospace",
+            size: "11px",
+            bold: "100",
+          },
+        },
+        notabene: LocalStorage.getItem('pn') || '',
       },
       loading: false
     },
@@ -118,6 +131,12 @@ export default function (/* { ssrContext } */) {
         LocalStorage.set('psp', payload.store.phone)
         state.printout.store.email = payload.store.email
         LocalStorage.set('pse', payload.store.email)
+
+        state.printout.styles = payload.styles
+        LocalStorage.set('ps', payload.styles)
+
+        state.printout.notabene = payload.notabene
+        LocalStorage.set('pn', payload.notabene)
       }
 
     },

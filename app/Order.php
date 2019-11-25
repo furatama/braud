@@ -60,7 +60,14 @@ class Order extends Model
             ->orderBy('tanggal','DESC')
             ->orderBy('id','DESC');
             // ->get();
-
+        $dari = request('dari');
+        $sampai = request('sampai');
+        if ($dari) {
+            $data = $data->whereDate('tanggal','>=', $dari);
+        }
+        if ($sampai) {
+            $data = $data->whereDate('tanggal','<=', $sampai);
+        }
         
         // dd($data->toSql());
 

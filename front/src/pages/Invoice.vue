@@ -2,7 +2,7 @@
   <q-page padding>
 
     <x-table
-      title="List Invoice"
+      title="List Invoice Credit"
       :data="table.data"
       :columns="table.columns"
       row-key="id"
@@ -16,20 +16,41 @@
     >
       <template v-slot:top-right>
         <div class="row reverse q-col-gutter-md">
-          <div style="width:400px">
+          <div class="row q-col-gutter-sm">
+            <q-input dense dark outlined label="Dari" v-model="filterDari" mask="####/##/##" placeholder="YYYY/MM/DD">
+              <template v-slot:append>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy>
+                    <q-date v-model="filterDari" />
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+            <q-input dense dark outlined label="Sampai" v-model="filterSampai" mask="####/##/##" placeholder="YYYY/MM/DD">
+              <template v-slot:append>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy>
+                    <q-date v-model="filterSampai" />
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+          </div>
+          <div style="width:300px">
             <select-filter dense class="bg-white" outlined label="Customer" v-model="table.customer" :options="table.customerOpts" :loading="loading"/>
           </div>
         </div>
       </template>
       <template v-slot:bottom>
-        <div class="row full-width justify-end">
-          <q-btn label="LUNASKAN DAN CETAK INVOICE" color="positive"/>
+        <div class="row full-width justify-between">
+          <span class="text-h5">Total Credit : {{$numeralCurrency(totalSelected)}}</span>
+          <q-btn :disabled="table.selected.length == 0" @click="onSubmit" label="LUNASKAN DAN CETAK INVOICE" color="positive"/>
         </div>
       </template>
     </x-table>
 
     <!-- <q-dialog persistent v-model="checkout.isShow" @hide="() => {checkout.isShow = false}">
-      <q-card style="width:50vw">
+      <q-card style="width:50vw">ooo
         <q-bar class="bg-primary text-white">
           <div class="text-h6">CHECKOUT</div>
 
@@ -92,7 +113,7 @@
 <script>
 import SelectFilter from '../components/plugins/SelectFilter'
 import TableEx from '../components/plugins/TableEx'
-import PrintOut from '../components/OrderPrintOut'
+import PrintOut from '../components/InvoicePrintOut'
 
 export default {
   // name: 'PageName',
@@ -111,12 +132,7 @@ export default {
         columns: [
           { name: 'tanggal', field: 'tanggal', label: 'Tanggal Order', type: 'date'},
           { name: 'no', field: 'no', label: 'No Order', type: 'string'},
-          // { name: 'customer', field: 'customer', label: 'Customer', type: 'string'},
-          // { name: 'metode', field: 'metode', label: 'Metode', type: 'enum', options: [
-          //   {label: 'Cash', value: 'cash'},{label: 'Credit', value: 'credit'},
-          // ]},
           { name: 'total', field: 'total', label: 'Total', type: 'decimal'},
-          // { name: 'tunai', field: 'tunai', label: 'Terbayar', type: 'decimal'},
           { name: 'lunas', field: 'lunas', label: 'Status', type: 'enum', options: [
             {label: 'Lunas', value: 1},{label: 'Belum Lunas', value: 0},{label: 'Jatuh Tempo', value: 2},
           ]}, 
@@ -130,6 +146,8 @@ export default {
         selected: [],
         getSelectedString: '',
       },
+      filterDari: '',
+      filterSampai: '',
       produkData: [],
       defProdukData: [],
       filter: '',
@@ -159,6 +177,12 @@ export default {
     customerData() {
       return this.table.customer
     },
+    //(on
+    totalSelected() {
+      return this.table.selected.reduce((sum,v) => {
+        return (sum * 1) + (1 * v.total)
+      },0)
+    },
     // orderDate() {
     //   return this.order.tanggal
     // },
@@ -170,32 +194,27 @@ export default {
     //   const paid = this.payment.paid
     //   return paid - total
     // },
-    // printData() {
-    //   return {
-    //     // no: this.order.no,
-    //     tanggal: this.$date.formatDate(this.order.tanggal, 'DD/MM/YYYY'),
-    //     due: this.$date.formatDate(this.order.due, 'DD/MM/YYYY'),
-    //     kasir: this.$store.getters.getName,
-    //     method: this.payment.method == 'cash' ? "CASH" : "CREDIT",
-    //     cust: {
-    //       nama: this.customerData.label,
-    //       email: this.customerData.email,
-    //       alamat: this.customerData.alamat,
-    //       telepon: this.customerData.telepon,
-    //     },
-    //     total: this.$numeralCurrency(this.table.grandTotal),
-    //     tunaiLabel: this.payment.method == 'cash' ? "Terbayar" : "Kredit",
-    //     tunai: this.$numeralCurrency(this.payment.paid),
-    //     sisaLabel: this.payment.method == 'cash' ? "Kembalian" : "Hutang",
-    //     sisa: this.payment.method == 'cash' ? this.$numeralCurrency(this.exchange) : this.$numeralCurrency(-this.exchange),
-    //     data: this.table.data
-    //   }
-    // }
+    printData() {
+      return {
+        // no: this.order.no,
+        data: this.table.selected,
+        total: this.totalSelected,
+        from: this.filterDari,
+        to: this.filterSampai,
+        customer: this.table.customer.label
+
+      }
+    }
   },
   watch: {
     customerData(val) {
-      console.log(val)
       this.requestData(val.value)
+    },
+    filterDari(val) {
+      this.requestData(this.table.customer.value)
+    },
+    filterSampai(val) {
+      this.requestData(this.table.customer.value)
     },
     orderDate() {
       this.loadNoOrder()
@@ -209,10 +228,14 @@ export default {
   },
   methods: {
     requestData(idCust) {
+      this.table.selected = []
       // let { page, rowsPerPage, rowsNumber, sortBy, descending } = pagination
       // return new Promise((resolve, reject) => {
-      this.$store.dispatch("fetchAll",
-        {url: 'order/customer/' +  idCust}
+      this.$store.dispatch("fetch",
+        {url: 'order/customer/' +  idCust, params: {
+          dari: this.filterDari,
+          sampai: this.filterSampai
+        }}
       ).then((response) => {
         let data = response.data
         this.table.data = data
@@ -247,33 +270,20 @@ export default {
           this.$notifyNegative("Gagal Mengambil Data Customer")
         })
     },
-    submitOrder() {
+    onSubmit() {
       let inputs = {
-        no: this.order.no,
-        id_customer: this.customerData.value,
-        metode: this.payment.method,
-        tanggal: this.orderDate,
-        due: this.order.due,
-        faktur: '',
-        tunai: this.payment.paid,
-        total: this.table.grandTotal,
-        keterangan: '',
-        detail: this.table.data.map((v) => {
-          return {
-            id_produk: v.id,
-            harga: v.hargaN,
-            qty: v.qty,
-            diskon: v.diskon
-          }
+        detail: this.table.selected.map((v) => {
+          return v.id
         }),
       }
-      this.$store.dispatch("postSingle",{url: `/order/data`,inputs})
+      this.$store.dispatch("postSingle",{url: `/order/invoice`,inputs})
         .then((response) => {
-          this.resetForm()
-          this.$notifyPositive("Berhasil Memasukkan Order")
+          this.requestData(this.table.customer.value)
+          this.printOrder()
+          this.$notifyPositive("Berhasil dilunaskan")
         }).catch((error) => {
           // console.log(error)
-          this.$notifyNegative("Gagal Memasukkan Order")
+          this.$notifyNegative("Gagal dilunaskan")
         })
     },
     printOrder() {
@@ -282,6 +292,13 @@ export default {
   },
   mounted() {
     this.loadCustomer()
+    const date = this.$date
+    const today = new Date()
+    const mon = date.daysInMonth(today)
+    const start = date.adjustDate(today, {date: 1})
+    const end = date.adjustDate(today, {date: mon})
+    this.filterDari = date.formatDate(start,'YYYY/MM/DD')
+    this.filterSampai = date.formatDate(end,'YYYY/MM/DD')
   }
 }
 </script>

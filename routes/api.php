@@ -85,6 +85,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::delete('order/data/{id}', 'OrderController@destroy');
     Route::get('order/detail', 'OrderController@indexWithDetail');
     Route::get('order/detail/{id}', 'OrderController@showWithDetail');
+    Route::post('order/invoice', 'OrderController@invoice');
     Route::get('order/kredit', 'OrderController@indexCredit');
     Route::get('order/customer/{id_cust}', 'OrderController@indexCust');
 

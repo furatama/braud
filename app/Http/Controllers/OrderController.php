@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Order;
+use App\OrderDetail;
 use App\Kredit;
 
 class OrderController extends Controller
@@ -100,6 +101,27 @@ class OrderController extends Controller
         $metode = $request->metode;
         $data = \DB::table('order')->whereDate('tanggal',$date)->count();
         return bd_json(["count" => $data]);
+    }
+
+    public function invoice(Request $request) {
+        $detail = $request->detail;
+        $od = OrderDetail::select('id_order',\DB::raw('SUM((100-diskon)/100*qty*harga) as total'))->groupBy('id_order');
+        Kredit::whereIn('id_order',$detail)->delete();
+        $data = Order::whereIn('id',$detail)
+            ->joinModel($od, 'od' , 'od.id_order' , 'order.id');
+        $update = $data->update([
+            'tunai' => \DB::raw("`total`")
+        ]);
+            
+        $kredit = $data->get()->map(function($items) {
+                $kreditParams = [
+                    "id_order" => $items->id,
+                    "tunai" => $items->total
+                ];
+                $kredit = (new Kredit)->record($kreditParams);
+                return $items;
+            });
+        return bd_json($data);
     }
 
 }

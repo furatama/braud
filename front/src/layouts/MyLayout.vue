@@ -175,8 +175,8 @@ export default {
         child: [
           {label: 'Customer', to: '/master/customer', role: ['admin','kasir']},
           {label: 'Produk', to: '/master/produk', role: ['admin','kasir','bakery']},
+          {label: 'Resep', to: '/master/resep', role: ['admin','bakery']},
           {label: 'Bahan', to: '/master/bahan', role: ['admin','bakery']},
-          {label: 'Komposisi', to: '/master/komposisi', role: ['admin','bakery']},
           {label: 'Staff', to: '/master/staff', role: ['admin']},
 				]
       },

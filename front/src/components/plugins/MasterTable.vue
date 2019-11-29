@@ -28,11 +28,11 @@
       <template v-slot:top-row="props">
         <q-tr v-if="!loading" :props="props">
           <q-td v-for="(col,index) in props.cols" :key="index">
-            <template v-if="col.type == 'string'">
-              <q-input debounce="300" v-model="col.filter" style="height:12px" input-style="padding:0px;font-size:12px" dense :placeholder="`${col.label}`"/>
-            </template>
-            <template v-else-if="col.type == 'boolean'">
+            <template v-if="col.type == 'boolean'">
               <q-toggle checked-icon="check" unchecked-icon="clear" :true-value="1" :false-value="0" v-model="col.filter" color="primary" dense style="margin-left:-15px"/>
+            </template>
+            <template v-else-if="col.type">
+              <q-input debounce="300" v-model="col.filter" style="height:12px" input-style="padding:0px;font-size:12px" dense :placeholder="`${col.label}`"/>
             </template>
           </q-td>
         </q-tr>
@@ -98,6 +98,9 @@
             </template>
             <template v-else-if="input.type == 'number'">
               <q-input type="number" :label="input.label" v-model.number="input.value" />
+            </template>            
+            <template v-else-if="input.type == 'decimal'">
+              <q-input type="number" :label="input.label" v-model.number="input.value" step="0.01" />
             </template>
             <template v-else-if="input.type == 'toggle'">
               <q-toggle class="q-my-sm" checked-icon="check" unchecked-icon="clear" :true-value="1" :false-value="0" v-model="input.value" color="primary" :label="input.label"/>
@@ -123,6 +126,17 @@
                   <q-btn round dense flat icon="add" @click="showResource(input,index)" />
                 </template>
               </q-select>
+            </template>
+            <template v-else-if="input.type == 'resource2'">
+              <select-filter v-model="input.value" :options="input.options" map-options :label="input.label">
+                <template v-if="input.resource.component" v-slot:append>
+                  <q-btn round dense flat icon="add" @click="showResource(input,index)" />
+                </template>
+              </select-filter>
+            </template>              
+            <template v-else-if="input.type == 'detail'">
+              <mtd v-model="input.value" :detail="input.detail" >
+              </mtd>
             </template>
           </div>
         </q-card-section>
@@ -183,6 +197,9 @@
 </template>
 
 <script>
+import MasterTableDetail from './MasterTableDetail'
+import SelectFilter from './SelectFilter'
+
 export default {
   name: 'MasterTable',
   props: {
@@ -191,6 +208,10 @@ export default {
     visibleColumns: Array,
     resourceURL: String,
     inputs: Array
+  },
+  components: {
+    'mtd' : MasterTableDetail,
+    'select-filter' : SelectFilter,
   },
   data () {
     return {
@@ -238,6 +259,14 @@ export default {
         this.rerequest()
       },
       deep: true
+    },
+    inputs: {
+      handler(val){
+        // console.log('newinp',val)
+        this.watchForm()
+        this.resetForm()
+      },
+      deep: true
     }
   },
   methods: {
@@ -251,7 +280,7 @@ export default {
           colFilter[el.name] = el.filter
       })
 
-      console.log(colFilter)
+      // console.log(colFilter)
 
       this.$store.dispatch("fetchAll",{url: this.resourceURL, filter, rowsPerPage, page, sortBy, descending, colFilter})
         .then((data) => {
@@ -309,7 +338,7 @@ export default {
       this.inps.forEach((input) => {
         if (input.value != null && input.value != undefined) {
           inputs[input.name] = input.value
-          if (input.value.value && input.type == 'resource' || input.type == 'select')
+          if (input.value.value && input.type == 'resource' || input.type == 'resource2' || input.type == 'select')
             inputs[input.name] = input.value.value
         }
       })
@@ -318,7 +347,7 @@ export default {
         this.formDialog = false
         setTimeout(() => {
           this.rerequest()
-        }, 100)
+        }, 500)
       }
       if (this.editID) {
         this.$store.dispatch("updateSingle",{url: this.resourceURL, id: this.editID, inputs})
@@ -334,7 +363,7 @@ export default {
           this.$notifyPositive('Data Berhasil Dimasukkan')
         }).catch((error) => {
           console.log(error)
-          this.$notifyNegative('Ada Sebuah Kesalahan')
+          this.$notifyNegative('Ada Sebuah Kesalahan (Data Duplikat / Database Tak Konek)')
         }).finally(afterSubmit())
       }
     },
@@ -352,10 +381,11 @@ export default {
         component: col.component,
         data: row
       }
-      console.log(this.component)
+      // console.log(this.component)
       this.componentDialog = true
     },
     fillResource(resource,index) {
+      console.log(resource,index,'ridx')
       this.$store.dispatch("fetchOptions",{url: resource.url})
         .then((response) => {
           let data = response.data
@@ -383,6 +413,18 @@ export default {
         }
       })
     },
+    watchForm() {
+      this.defInps = this.inputs.map((input,index) => {
+        if (input.type == 'resource' || input.type == 'resource2') {
+          this.fillResource(input.resource,index)
+        }
+        return {
+          ...input,
+          label: input.label ? input.label : input.name.toUpperCase(),
+          value: input.default ? input.default : null
+        }
+      })
+    }
   },
   created() {
     this.cols = this.columns.map((col) => {
@@ -393,8 +435,10 @@ export default {
         field: col.field || col.name,
         filter: col.filter || (col.type == 'boolean' ? 1 : ''),
         format: (val, row) => {
-          if (col.type === 'integer' || col.type === 'decimal') {
+          if (col.type === 'integer') {
             return this.$numeralCurrency(val)
+          } else if (col.type === 'decimal') {
+            return this.$numeralCurrency2(val)
           } else if (col.type === 'date') {
             return this.$date.formatDate(val, 'DD/MMMM/YYYY')
           }
@@ -411,17 +455,7 @@ export default {
   mounted () {    
     // this.rerequest()
 
-    this.defInps = this.inputs.map((input,index) => {
-      if (input.type == 'resource') {
-        this.fillResource(input.resource,index)
-      }
-      return {
-        ...input,
-        label: input.label ? input.label : input.name.toUpperCase(),
-        value: input.default ? input.default : null
-      }
-    })
-
+    this.watchForm()
     this.resetForm()
   },
 }

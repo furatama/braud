@@ -109,4 +109,21 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('report/produk/excel','ReportController@produkExcel');
     Route::get('report/order/excel','ReportController@orderExcel');
 
+    Route::get('bahan/data', 'BahanController@index');
+    Route::post('bahan/data', 'BahanController@store');
+    Route::get('bahan/data/{id}', 'BahanController@show');
+    Route::put('bahan/data/{id}', 'BahanController@update');
+    Route::delete('bahan/data/{id}', 'BahanController@destroy');
+    
+    Route::get('bahan/resep/{id_resep}', 'BahanController@getBahan');
+
+    Route::get('resep/data', 'ResepController@index');
+    Route::post('resep/data', 'ResepController@store');
+    Route::get('resep/data/{id}', 'ResepController@show');
+    Route::put('resep/data/{id}', 'ResepController@update');
+    Route::delete('resep/data/{id}', 'ResepController@destroy');
+
+    Route::get('resep/options', 'ResepController@resepOptions');
+
+
 });

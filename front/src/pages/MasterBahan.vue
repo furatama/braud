@@ -1,7 +1,7 @@
 <template>
   <q-page padding>
     <m-table  
-      title="Master Customer"
+      title="Master Bahan"
       :columns="columns"
       :resourceURL="resourceURL"
       :inputs="inputs"
@@ -14,28 +14,22 @@
 import MasterTable from '../components/plugins/MasterTable'
 
 export default {
-  name: 'MasterCustomer',
+  name: 'MasterBahan',
   components: {
     'm-table' : MasterTable
   },
   data() {
     return {
-      resourceURL: "/api/test",
+      resourceURL: "/bahan/data",
       columns: [
-        { name: 'int', type: 'integer'},
-        { name: 'str', type: 'string'},
-        { name: 'bool', type: 'boolean' },
-        { name: 'unit', type: 'string' },
-        { name: 'date', type: 'date'},
+        { name: 'nama', label: 'Nama', type: 'string'},
+        { name: 'harga', label: 'Harga/Kg', type: 'decimal'},
+        { name: 'jenis', label: 'Jenis', type: 'string'},
       ],
       inputs: [
-        { name: 'int', type: 'number', required: true},
-        { name: 'str', type: 'text', required: true},
-        { name: 'id_unit', type: 'resource', required: true, resource: {
-          url: '/api/unit', component: () => import('components/MasterUnit.vue'), label: 'nama',
-        }},
-        { name: 'bool', type: 'toggle', required: true, default: 1 },
-        { name: 'date', type: 'date', required: true},
+        { name: 'nama', label: 'Nama', type: 'text'},
+        { name: 'harga', label: 'Harga/Kg', type: 'decimal'},
+        { name: 'jenis', label: 'Jenis', type: 'text'},
       ]
     }
   }

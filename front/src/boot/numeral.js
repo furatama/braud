@@ -23,6 +23,7 @@ export default async ({ Vue }) => {
   Vue.prototype.$numeral = numeral
   Vue.prototype.$numeralVal = (val) => {return numeral(val).value()}
   Vue.prototype.$numeralCurrency = (val) => {return numeral(val).format('0,0')}
+  Vue.prototype.$numeralCurrency2 = (val) => {return numeral(val).format('0,0[.]00')}
   Vue.prototype.$numeralCurrencyAdd = (val1,val2) => {return numeral(numeral(val1).value() + numeral(val2).value()).format('0,0')}
   Vue.prototype.$numeralCurrencySub = (val1,val2) => {return numeral(numeral(val1).value() - numeral(val2).value()).format('0,0')}
   Vue.prototype.$numeralCurrencyMul = (val1,val2) => {return numeral(numeral(val1).value() * numeral(val2).value()).format('0,0')}

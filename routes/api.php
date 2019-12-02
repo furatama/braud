@@ -55,6 +55,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::delete('produk/data/{id}', 'ProdukController@destroy');
     Route::get('produk/detail', 'ProdukController@indexWithDetail');
     Route::get('produk/detail/{id}', 'ProdukController@showWithDetail');
+    Route::get('produk/opts', 'ProdukController@options');
 
     Route::get('produk/aktif', 'ProdukController@indexAktif');
     Route::get('produk/all', 'ProdukController@indexAll');
@@ -114,7 +115,8 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('bahan/data/{id}', 'BahanController@show');
     Route::put('bahan/data/{id}', 'BahanController@update');
     Route::delete('bahan/data/{id}', 'BahanController@destroy');
-    
+
+    Route::get('bahan/opts', 'BahanController@options');    
     Route::get('bahan/resep/{id_resep}', 'BahanController@getBahan');
 
     Route::get('resep/data', 'ResepController@index');

@@ -72,5 +72,11 @@ class ProdukController extends Controller
         return bd_json($data);
     }
 
+    public function options()
+    {        
+        $data = Produk::select('id','nama')->orderBy('nama');
+        return bd_json($data);
+    }
+
 
 }

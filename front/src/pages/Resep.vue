@@ -5,7 +5,7 @@
         <select-filter outlined label="Produk" v-model="produk" :options="produkOpts" :loading="loading"/>
       </div>
       <div>
-        <q-input outlined label="Jumlah Resep" type="number" v-model="nResep"/>
+        <q-input debounce="100" outlined label="Jumlah Resep" type="number" v-model="nResep"/>
       </div>
       <div>
         <form-table
@@ -33,6 +33,9 @@
                 <b>{{jmlSisa}}</b>
               </q-td>
               <q-td align="right">
+                <b>{{jmlHarga}}</b>
+              </q-td>
+              <q-td align="right">
                 <b>{{jmlBudget}}</b>
               </q-td>
               <q-td align="right">
@@ -48,7 +51,7 @@
 
 <script>
 
-
+import {Decimal} from 'decimal.js';
 export default {
   // name: 'Resep',
   components: {
@@ -61,9 +64,10 @@ export default {
       cols: [
         { name: 'bahan', label: 'Bahan', attr: {style: 'font-weight:bold'}, align: 'left' },
         { name: 'diperlukan', label: 'Batch/Rasio/1-Resep', align: 'right' },
-        { name: 'batch', type: 'number', label: 'Batch/Rasio', attr: {step: '0.001', dense: true}, align: 'right' },
+        { name: 'batch', type: 'number', label: 'Batch/Rasio', attr: {step: '0.000000001', dense: true}, align: 'right' },
         { name: 'terpakai', label: 'Jumlah Terpakai', align: 'right' },
         { name: 'sisa', label: 'Jumlah Sisa', align: 'right' },
+        { name: 'harga', label: 'Harga/Kg', align: 'right' },
         { name: 'budget', label: 'Budget Batch', align: 'right' },
         { name: 'efektif', label: 'Budget Efektif', align: 'right' },
       ],
@@ -87,29 +91,33 @@ export default {
       }
     },
     jmlPerResep() {
-     return  this.dataBahan.reduce((total,element) => element.diperlukan * 1.0 + total * 1.0, 0.00)
+     return  this.dataBahan.reduce((total,element) => (new Decimal(element.diperlukan)).plus(total), 0.00)
     },
     jmlBatch() {
-     return  this.dataBahan.reduce((total,element) => element.batch * 1.0 + total * 1.0, 0.00)
+     return  this.dataBahan.reduce((total,element) => (new Decimal(element.batch)).plus(total), 0.00)
     },
     jmlTerpakai() {
-     return  this.dataBahan.reduce((total,element) => element.terpakai * 1.0 + total * 1.0, 0.00)
+     return  this.dataBahan.reduce((total,element) => (new Decimal(element.terpakai)).plus(total), 0.00)
     },
     jmlSisa() {
-     return this.jmlBatch - this.jmlTerpakai
+     return (new Decimal(this.jmlBatch)).minus(this.jmlTerpakai)
+    },
+    jmlHarga() {
+     return  this.dataBahan.reduce((total,element) => (new Decimal(element.harga)).plus(total), 0.00)
     },
     jmlBudget() {
-     return  this.dataBahan.reduce((total,element) => element.harga * element.batch, 0.00)
+     return  this.dataBahan.reduce((total,element) => (new Decimal(element.budget)).plus(total), 0.00)
     },
     jmlEfektif() {
-     return  this.dataBahan.reduce((total,element) => element.harga * element.terpakai, 0.00)
+     return  this.dataBahan.reduce((total,element) => (new Decimal(element.efektif)).plus(total), 0.00)
     }
   },
   watch: {
     produk() {
       this.loadBahan()
     },
-    nResep() {
+    nResep(val) {
+      if (!val) return;
       if (this.watchOnce == false) {
         this.watchOnce = true
         this.calculateFromN()
@@ -134,21 +142,22 @@ export default {
   methods: {
     calculateFromN() {
       this.dataBahan = this.dataBahan.map(v => {
-        let batch = v.diperlukan * this.nResep
+        let batch = (new Decimal(v.diperlukan)).times(this.nResep)
+        // let batch = v.diperlukan * this.nResep
         return {
           ...v,
           batch: batch,
           terpakai: batch,
           sisa: 0,
-          budget: v.harga * batch,
-          efektif: v.harga * batch,
+          budget: (new Decimal(v.harga)).times(batch),
+          efektif: (new Decimal(v.harga)).times(batch),
         }
       })
     },
     calculateFromBahan() {
       let n = 9999
       this.dataBahan.forEach(v => {
-        const c = v.batch / v.diperlukan
+        const c = (new Decimal(v.batch)).dividedBy(v.diperlukan)
         n = Math.min(n,c)
       });
       n = Math.floor(n)
@@ -157,9 +166,9 @@ export default {
         return {
           ...v,
           terpakai: terpakai,
-          sisa: v.batch - terpakai,
-          budget: v.harga * v.batch,
-          efektif: v.harga * terpakai,
+          sisa: (new Decimal(v.batch)).minus(terpakai),
+          budget: (new Decimal(v.harga)).times(v.batch),
+          efektif: (new Decimal(v.harga)).times(terpakai),
         }
       })
       this.nResep = n
@@ -175,8 +184,8 @@ export default {
               diperlukan: v.batch,
               terpakai: v.batch,
               sisa: 0,
-              budget: v.harga * v.batch,
-              efektif: v.harga * v.batch,
+              budget: (new Decimal(v.harga)).times(v.batch),
+              efektif: (new Decimal(v.harga)).times(v.batch),
             }
           })
         }).catch((error) => {

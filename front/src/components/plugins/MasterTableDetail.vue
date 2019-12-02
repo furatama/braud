@@ -13,7 +13,7 @@
           </q-select>
         </template>
         <template v-else-if="input.type == 'decimal'">
-          <q-input type="number" :label="input.label + ' ' + (index+1)" :value="gVal(val,input.name)" @input="(v) => onInput(input.name,index,v)" step="0.01"  />
+          <q-input type="number" :label="input.label + ' ' + (index+1)" :value="gVal(val,input.name)" @input="(v) => onInput(input.name,index,v)" step="0.000000001"  />
         </template>
       </div>
     </div>

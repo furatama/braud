@@ -49,4 +49,12 @@ class BahanController extends Controller
         );
         return bd_json($data);
     }
+
+    public function options()
+    {
+        $data = Bahan::select('*')->orderBy('nama');
+        $tableData = (new Bahan)->getTableProperties();
+        $data = $data->searchAllFields($tableData);
+        return bd_json($data);
+    }
 }

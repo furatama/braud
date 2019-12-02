@@ -35,7 +35,7 @@ export default {
     }
   },
   async mounted() {
-    let response = await this.$store.dispatch("fetchOptions",{url: '/bahan/data'})
+    let response = await this.$store.dispatch("fetchOptions",{url: '/bahan/opts'})
     const data = response.data
     this.bahan = data.map((v) => {
       return {

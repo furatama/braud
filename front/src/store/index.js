@@ -55,6 +55,7 @@ export default function (/* { ssrContext } */) {
           },
         },
         notabene: LocalStorage.getItem('pn') || '',
+        notabenei: LocalStorage.getItem('pn2') || '',
       },
       loading: false
     },
@@ -137,6 +138,8 @@ export default function (/* { ssrContext } */) {
 
         state.printout.notabene = payload.notabene
         LocalStorage.set('pn', payload.notabene)
+        state.printout.notabenei = payload.notabenei
+        LocalStorage.set('pn2', payload.notabene)
       }
 
     },

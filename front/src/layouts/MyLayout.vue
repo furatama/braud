@@ -17,7 +17,7 @@
           Braud Artisan Bakery
         </q-toolbar-title>
 
-        <div>v1.4</div>
+        <div>v1.5</div>
       </q-toolbar>
     </q-header>
 
@@ -175,9 +175,10 @@ export default {
         child: [
           {label: 'Customer', to: '/master/customer', role: ['admin','kasir']},
           {label: 'Produk', to: '/master/produk', role: ['admin','kasir','bakery']},
-          {label: 'Resep', to: '/master/resep', role: ['admin','bakery']},
-          {label: 'Bahan', to: '/master/bahan', role: ['admin','bakery']},
-          {label: 'Staff', to: '/master/staff', role: ['admin']},
+          {label: 'Resep', to: '/master/resepproduk', role: ['admin','bakery']},
+          {label: 'Resep Detail', to: '/master/resepdetail', role: ['admin','bakery']},
+          // {label: 'Bahan', to: '/master/bahan', role: ['admin','bakery']},
+          // {label: 'Staff', to: '/master/staff', role: ['admin']},
 				]
       },
     ]

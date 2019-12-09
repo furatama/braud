@@ -93,6 +93,14 @@
           (<span style="margin-left:120px"/>)</div>
         </div>
       </div>
+      <div class="q-mt-md" :style="`margin-left: ${po.margin.left}`">
+        <div v-if="po.notabenei" :style="`
+          font-family: ${po.font.three};
+          font-size: 10.5px;
+        `">
+          <pre>{{po.notabenei}} </pre>
+        </div>
+      </div>
     </div>
   </div>
 </template>

@@ -42,11 +42,14 @@
         <q-input dense outlined v-model="printout.styles.num.size" label="Font Size"/>
         <q-input dense outlined v-model="printout.styles.num.bold" label="Bold?"/>
       </div>
-      <q-input autogrow outlined v-model="printout.notabene" label="Nota"/>
       <q-input outlined v-model="printout.store.name" label="Nama Usaha"/>
       <q-input outlined v-model="printout.store.address" label="Alamat Usaha"/>
       <q-input outlined v-model="printout.store.phone" label="Telpon Usaha"/>
       <q-input outlined v-model="printout.store.email" label="Email Usaha"/>
+      <span class="text-underline">Printout Kasir</span>
+      <q-input autogrow outlined v-model="printout.notabene" label="Nota Printout Kasir"/>
+      <span class="text-underline">Printout Invoice</span>
+      <q-input autogrow outlined v-model="printout.notabenei" label="Nota Printout Invoice"/>
       <div class="row justify-end">
         <q-btn type="submit" label="Update Printout" color="positive"/>
       </div>
@@ -144,6 +147,7 @@ export default {
         }, 
         styles: this.printout.styles,
         notabene: this.printout.notabene,
+        notabenei: this.printout.notabenei,
       })
     }
   },
@@ -169,6 +173,7 @@ export default {
       },
       styles: this.$store.state.printout.styles,
       notabene: this.$store.state.printout.notabene,
+      notabenei: this.$store.state.printout.notabenei,
     }
   },
 }

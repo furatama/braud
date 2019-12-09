@@ -48,65 +48,10 @@
         </div>
       </template>
     </x-table>
-
-    <!-- <q-dialog persistent v-model="checkout.isShow" @hide="() => {checkout.isShow = false}">
-      <q-card style="width:50vw">ooo
-        <q-bar class="bg-primary text-white">
-          <div class="text-h6">CHECKOUT</div>
-
-          <q-space />
-
-          <q-btn dense flat icon="close" v-close-popup>
-            <q-tooltip>Close</q-tooltip>
-          </q-btn>
-        </q-bar>
-        
-        <q-card-section>
-          <q-input label="Total Harga" :value="$numeralCurrency(table.grandTotal)" readonly input-class="text-right text-h5"/>
-          <div class="row q-my-sm">
-            <span class="q-mt-sm">Metode Pembayaran : </span><q-option-group v-model="payment.method" :options="payment.options" color="primary" inline/>
-          </div>
-          <q-input label="Jumlah Bayar" v-model="payment.paid" input-class="text-right text-h5"/>
-          <div class="row q-my-sm q-col-gutter-xs">
-            <div class="col"><q-btn class="full-width" dense color="negative" label="CLEAR" @click="addMoney('clear')"/></div>
-            <div class="col"><q-btn class="full-width" dense color="primary" label="1.000" @click="addMoney(1000)"/></div>
-            <div class="col"><q-btn class="full-width" dense color="primary" label="2.000" @click="addMoney(2000)"/></div>
-            <div class="col"><q-btn class="full-width" dense color="primary" label="5.000" @click="addMoney(5000)"/></div>
-            <div class="col"><q-btn class="full-width" dense color="primary" label="10.000" @click="addMoney(10000)"/></div>
-            <div class="col"><q-btn class="full-width" dense color="primary" label="20.000" @click="addMoney(20000)"/></div>
-            <div class="col"><q-btn class="full-width" dense color="primary" label="50.000" @click="addMoney(50000)"/></div>
-            <div class="col"><q-btn class="full-width" dense color="primary" label="100.000" @click="addMoney(100000)"/></div>
-            <div class="col"><q-btn class="full-width" dense color="positive" label="PAS" @click="addMoney('pas')"/></div>
-          </div>
-          <q-input :label="exchangeLabel" :value="displayExchange" readonly input-class="text-right text-h5"/>
-        </q-card-section>
-
-        <q-card-actions align="right" class="bg-primary text-white">
-          <q-btn
-            label="CETAK ORDER" 
-            color="positive" 
-            bordered 
-            icon="print"
-            :disable="(exchange < 0 && payment.method == 'cash') || (exchange > 0 && payment.method == 'credit')" 
-            @click="() => {submitOrder(); printOrder();}"
-          >
-          </q-btn>
-          
-        </q-card-actions>
-      </q-card>
-    </q-dialog> -->
-    <!-- <div class="absolute-bottom full-width bg-accent shadow-3">
-      asdf
-    </div> -->
     <print-out 
       ref="printer" 
       :data="printData"
     />
-      <!-- :data="table.data" 
-      :total="table.grandTotal" 
-      :cash="paidAmount" 
-      :exchange="exchange" 
-      :date="$date.formatDate(Date.now(), 'DD.MM.YY-HH:mm')" -->
   </q-page>
 </template>
 
@@ -168,35 +113,16 @@ export default {
     loading() {
       return this.$store.state.loading 
     },
-    // displayExchange() {
-    //   return this.payment.method === 'cash' ? this.$numeralCurrency(this.exchange) : this.$numeralCurrency(-this.exchange)
-    // },
-    // exchangeLabel() {
-    //   return this.payment.method === 'cash' ? 'Kembalian' : 'Sisa Hutang'
-    // },
     customerData() {
       return this.table.customer
     },
-    //(on
     totalSelected() {
       return this.table.selected.reduce((sum,v) => {
         return (sum * 1) + (1 * v.total)
       },0)
     },
-    // orderDate() {
-    //   return this.order.tanggal
-    // },
-    // payMethod() {
-    //   return this.payment.method
-    // },
-    // exchange() {
-    //   const total = this.table.grandTotal
-    //   const paid = this.payment.paid
-    //   return paid - total
-    // },
     printData() {
       return {
-        // no: this.order.no,
         data: this.table.selected,
         total: this.totalSelected,
         from: this.filterDari,

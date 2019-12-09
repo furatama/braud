@@ -10,7 +10,7 @@ const routes = [
       { path: 'kasir', component: () => import('pages/Kasir.vue'), meta: {role: ['admin','kasir']} },
       { path: 'order', component: () => import('pages/Order.vue'), meta: {role: ['admin','kasir']} },
       { path: 'invoice', component: () => import('pages/Invoice.vue'), meta: {role: ['admin','kasir']} },
-      { path: 'resep', component: () => import('pages/REsep.vue'), meta: {role: ['admin','bakery']} },
+      { path: 'resep', component: () => import('pages/ResepProduk.vue'), meta: {role: ['admin','bakery']} },
       { path: 'report/customer', component: () => import('pages/ReportCustomer.vue'), meta: {role: ['admin','kasir']} },
       { path: 'report/produk', component: () => import('pages/ReportProduk.vue'), meta: {role: ['admin','kasir']} },
       { path: 'report/order', component: () => import('pages/ReportOrder.vue'), meta: {role: ['admin','kasir']} },
@@ -18,6 +18,8 @@ const routes = [
       { path: 'master/produk', component: () => import('pages/MasterProduk.vue'), meta: {role: ['admin','kasir','bakery']} },
       { path: 'master/bahan', component: () => import('pages/MasterBahan.vue'), meta: {role: ['admin','bakery']} },
       { path: 'master/resep', component: () => import('pages/MasterResep.vue'), meta: {role: ['admin','bakery']} },
+      { path: 'master/resepproduk', component: () => import('pages/MasterResepProduk.vue'), meta: {role: ['admin','bakery']} },
+      { path: 'master/resepdetail', component: () => import('pages/MasterResepDetail.vue'), meta: {role: ['admin','bakery']} },
       { path: 'master/staff', component: () => import('pages/MasterStaff.vue'), meta: {role: ['admin']} },
     ]
   },

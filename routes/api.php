@@ -127,5 +127,20 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
     Route::get('resep/options', 'ResepController@resepOptions');
 
+    Route::get('resep-produk/data', 'ResepProdukController@index');
+    Route::post('resep-produk/data', 'ResepProdukController@store');
+    Route::get('resep-produk/data/{id}', 'ResepProdukController@show');
+    Route::put('resep-produk/data/{id}', 'ResepProdukController@update');
+    Route::delete('resep-produk/data/{id}', 'ResepProdukController@destroy');
+
+    Route::get('resep-produk/options', 'ResepProdukController@options');
+    Route::get('resep-produk/proses', 'ResepProdukController@proses');
+
+    Route::get('resep-detail/data', 'ResepDetailController@index');
+    Route::post('resep-detail/data', 'ResepDetailController@store');
+    Route::get('resep-detail/data/{id}', 'ResepDetailController@show');
+    Route::put('resep-detail/data/{id}', 'ResepDetailController@update');
+    Route::delete('resep-detail/data/{id}', 'ResepDetailController@destroy');
+
 
 });

@@ -17,7 +17,7 @@
           Braud Artisan Bakery
         </q-toolbar-title>
 
-        <div>v1.5</div>
+        <div>v1.6</div>
       </q-toolbar>
     </q-header>
 
@@ -149,15 +149,12 @@ export default {
       },      
       {
         label: 'Invoice',
-        to: '/invoice',
         icon: 'insert_drive_file',
+        child: [
+          {label: 'Pembuatan', to: '/invoice'},
+          {label: 'Pelunasan', to: '/invoice-lunas'},
+        ],
         role: ['admin','kasir']
-      },
-      {
-        label: 'Hitung Resep',
-        to: '/resep',
-        icon: 'list_alt',
-        role: ['admin','bakery']
       },
       {
         label: 'Report',
@@ -168,6 +165,12 @@ export default {
           {label: 'Produk', to: '/report/produk'},
         ],
         role: ['admin','kasir']
+      },
+      {
+        label: 'Hitung Resep',
+        to: '/resep',
+        icon: 'cake',
+        role: ['admin','bakery']
       },
       {
         label: 'Master',

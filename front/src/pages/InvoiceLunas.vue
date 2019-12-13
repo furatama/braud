@@ -2,13 +2,11 @@
   <q-page padding>
 
     <x-table
-      title="List Order"
+      title="List Invoice Credit"
       :data="table.data"
       :columns="table.columns"
-      row-key="id"
       :pagination.sync="table.pagination"
       :loading="loading"
-      selection="multiple"
       :rows-per-page-options="[0]"
       class="bg-secondary text-anti-primary"
       table-class="no-scroll bg-accent text-primary"
@@ -42,16 +40,41 @@
         </div>
       </template>
       <template v-slot:bottom>
-        <div class="row full-width justify-between">
-          <span class="text-h5">Total Credit : {{$numeralCurrency(totalSelected)}}</span>
-          <q-btn :disabled="table.selected.length == 0" @click="onSubmit" label="CETAK INVOICE" color="positive"/>
-        </div>
       </template>
     </x-table>
-    <print-out 
-      ref="printer" 
-      :data="printData"
-    />
+
+    <q-dialog v-if="curData" v-model="showEdit">
+      <q-card style="min-width:40vw">
+        <q-bar class="bg-primary text-white">
+          <div class="text-h6">Edit Invoice</div>
+          <q-space />
+          <q-btn dense flat icon="close" v-close-popup>
+            <q-tooltip>Close</q-tooltip>
+          </q-btn>
+        </q-bar>
+        <q-card-section>
+          <div class="column">
+            <q-input autogrow label="Catatan" v-model="curData.catatan" />
+          </div>
+        </q-card-section>
+        <q-card-actions>
+          <div class="row justify-end q-gutter-sm q-my-xs full-width">
+            <q-btn type="button" icon="delete" color="negative">
+              <q-popup-proxy :breakpoint="600">
+                <q-banner inline-actions class="bg-negative text-white">
+                  Yakin?
+                  <template v-slot:action>
+                    <q-btn flat label="Ya" v-close-popup @click="onDelete"/>
+                  </template>
+                </q-banner>
+              </q-popup-proxy>
+            </q-btn>
+            <q-btn type="button" label="SIMPAN INV" @click="onSubmit(false)" color="positive"/>
+            <q-btn type="button" label="LUNASKAN INV" @click="onSubmit(true)" color="positive"/>
+          </div>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -75,12 +98,18 @@ export default {
         customer: '',
         customerOpts: [],
         columns: [
-          { name: 'tanggal', field: 'tanggal', label: 'Tanggal Order', type: 'date'},
-          { name: 'no', field: 'no', label: 'No Order', type: 'string'},
-          { name: 'total', field: 'total', label: 'Total', type: 'decimal'},
+          { name: 'tanggal', field: 'tanggal', label: 'Tanggal Invoice', type: 'date'},
+          { name: 'customer', field: 'customer', label: 'Customer', type: 'string'},
+          { name: 'no', field: 'no', label: 'No Order (3 digit belakang)', type: 'string'},
+          { name: 'order', field: 'order', label: 'Total', type: 'decimal'},
           { name: 'lunas', field: 'lunas', label: 'Status', type: 'enum', options: [
-            {label: 'Lunas', value: 1},{label: 'Belum Lunas', value: 0},{label: 'Jatuh Tempo', value: 2},
-          ]}, 
+            {label: 'Lunas', value: 1},{label: 'Belum', value: 0},{label: 'J.Tmpo', value: 2},
+          ]},
+          { name: 'catatan', field: 'catatan', label: 'Catatan', type: 'string'},
+          { name: 'edit', field: 'edit', label: 'Edit', type: 'callback', attr: {color: 'positive'}, callback: (row) => {
+            this.showEdit = true
+            this.curData = {...row}
+          }},
         ],
         pagination: {
           rowsPerPage: 0
@@ -93,20 +122,9 @@ export default {
       },
       filterDari: '',
       filterSampai: '',
-      produkData: [],
-      defProdukData: [],
-      filter: '',
-      checkout: {
-        isShow: false,
-      },
-      payment: {
-        paid: 0,
-        method: 'cash',
-        options: [
-          {label: 'Cash', value: 'cash'},
-          {label: 'Credit', value: 'credit'},
-        ],
-      }
+      editCatatan: '',
+      showEdit: false,
+      curData: null
     }
   },
   computed: {
@@ -133,14 +151,14 @@ export default {
     }
   },
   watch: {
-    customerData(val) {
-      this.requestData(val.value)
+    customerData() {
+      this.requestData()
     },
-    filterDari(val) {
-      this.requestData(this.table.customer.value)
+    filterDari() {
+      this.requestData()
     },
-    filterSampai(val) {
-      this.requestData(this.table.customer.value)
+    filterSampai() {
+      this.requestData()
     },
     orderDate() {
       this.loadNoOrder()
@@ -153,12 +171,12 @@ export default {
     }
   },
   methods: {
-    requestData(idCust) {
+    requestData() {
       this.table.selected = []
-      // let { page, rowsPerPage, rowsNumber, sortBy, descending } = pagination
-      // return new Promise((resolve, reject) => {
+      const idCust = this.table.customer.value
       this.$store.dispatch("fetch",
-        {url: 'order/customer/' +  idCust, params: {
+        {url: '/invoice/data', params: {
+          id_customer: idCust,
           dari: this.filterDari,
           sampai: this.filterSampai
         }}
@@ -196,29 +214,32 @@ export default {
           this.$notifyNegative("Gagal Mengambil Data Customer")
         })
     },
-    onSubmit() {
+    onSubmit(lunas) {
       let inputs = {
-        id_customer: this.table.customer.hasOwnProperty('value') ? this.table.customer.value : this.table.customer,
-        tanggal: this.$date.formatDate(Date(),'YYYY/MM/DD'),
-        detail: this.table.selected.map((v) => {
-          return {
-            id_order: v.id, 
-          }
-        }),
+        ...this.curData,
+        lunaskan: lunas
       }
-      console.log(inputs)
-      this.$store.dispatch("postSingle",{url: `/invoice/data`,inputs})
+      this.$store.dispatch("updateSingle",{url: '/invoice/data', id: this.curData.id, inputs})
         .then((response) => {
-          this.requestData(this.table.customer.value)
-          this.printOrder()
-          this.$notifyPositive("Berhasil dilunaskan")
+          this.requestData()
+          this.$notifyPositive("Berhasil diedit")
+          this.showEdit = false
         }).catch((error) => {
           // console.log(error)
-          this.$notifyNegative("Gagal dilunaskan")
+          this.$notifyNegative("Gagal diedit")
         })
     },
-    printOrder() {
-      this.$refs.printer.print()
+    onDelete() {
+      const row = curData 
+      this.$store.dispatch("deleteSingle",{url: '/invoice/data', id: row.id})
+      .then((data) => {
+        this.$notifyPositive('Invoice Berhasil Dihapus')
+      }).catch((error) => {
+        console.log(error)
+        this.$notifyNegative('Ada Sebuah Kesalahan')
+      }).finally(() => {
+        this.requestData()
+      })
     },
   },
   mounted() {

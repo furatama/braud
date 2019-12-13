@@ -142,5 +142,11 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::put('resep-detail/data/{id}', 'ResepDetailController@update');
     Route::delete('resep-detail/data/{id}', 'ResepDetailController@destroy');
 
+    Route::get('invoice/data', 'InvoiceController@index');
+    Route::post('invoice/data', 'InvoiceController@store');
+    Route::get('invoice/data/{id}', 'InvoiceController@show');
+    Route::put('invoice/data/{id}', 'InvoiceController@update');
+    Route::delete('invoice/data/{id}', 'InvoiceController@destroy');
+
 
 });

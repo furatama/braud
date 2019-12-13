@@ -10,6 +10,7 @@ const routes = [
       { path: 'kasir', component: () => import('pages/Kasir.vue'), meta: {role: ['admin','kasir']} },
       { path: 'order', component: () => import('pages/Order.vue'), meta: {role: ['admin','kasir']} },
       { path: 'invoice', component: () => import('pages/Invoice.vue'), meta: {role: ['admin','kasir']} },
+      { path: 'invoice-lunas', component: () => import('pages/InvoiceLunas.vue'), meta: {role: ['admin','kasir']} },
       { path: 'resep', component: () => import('pages/ResepProduk.vue'), meta: {role: ['admin','bakery']} },
       { path: 'report/customer', component: () => import('pages/ReportCustomer.vue'), meta: {role: ['admin','kasir']} },
       { path: 'report/produk', component: () => import('pages/ReportProduk.vue'), meta: {role: ['admin','kasir']} },

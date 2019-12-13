@@ -193,7 +193,7 @@ export default {
     return {
       order: {
         no: '',
-        tanggal: this.$date.formatDate(Date.now(),'YYYY/MM/DD'),
+        tanggal: this.$date.formatDate(this.$date.addToDate(new Date(), { days: 1 }),'YYYY/MM/DD'),
         due: this.$date.formatDate(this.$date.adjustDate(this.$date.addToDate(new Date(), {month: 1}), {date: 20}),'YYYY/MM/DD'),
         customer: '',
         customerOpts: [],

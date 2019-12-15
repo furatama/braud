@@ -44,7 +44,10 @@
       <template v-slot:bottom>
         <div class="row full-width justify-between">
           <span class="text-h5">Total Credit : {{$numeralCurrency(totalSelected)}}</span>
-          <q-btn :disabled="table.selected.length == 0" @click="onSubmit" label="CETAK INVOICE" color="positive"/>
+          <div class="row q-gutter-sm">
+            <q-btn :disabled="table.selected.length == 0" @click="onSubmit(false)" label="CETAK INVOICE" color="positive"/>
+            <q-btn :disabled="table.selected.length == 0" @click="onSubmit(true)" label="CETAK & SIMPAN" color="positive"/>
+          </div>
         </div>
       </template>
     </x-table>
@@ -196,7 +199,11 @@ export default {
           this.$notifyNegative("Gagal Mengambil Data Customer")
         })
     },
-    onSubmit() {
+    onSubmit(simpan) {
+      if (!simpan) {
+        this.printOrder()
+        return
+      }
       let inputs = {
         id_customer: this.table.customer.hasOwnProperty('value') ? this.table.customer.value : this.table.customer,
         tanggal: this.$date.formatDate(Date(),'YYYY/MM/DD'),
@@ -211,10 +218,10 @@ export default {
         .then((response) => {
           this.requestData(this.table.customer.value)
           this.printOrder()
-          this.$notifyPositive("Berhasil dilunaskan")
+          this.$notifyPositive("Invoice berhasil disimpan")
         }).catch((error) => {
           // console.log(error)
-          this.$notifyNegative("Gagal dilunaskan")
+          this.$notifyNegative("Invoice gagal disimpan")
         })
     },
     printOrder() {

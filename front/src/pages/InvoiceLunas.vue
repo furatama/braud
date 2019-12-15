@@ -219,14 +219,15 @@ export default {
         ...this.curData,
         lunaskan: lunas
       }
+      const ed = lunas ? "dilunaskan" : "diedit"
       this.$store.dispatch("updateSingle",{url: '/invoice/data', id: this.curData.id, inputs})
         .then((response) => {
           this.requestData()
-          this.$notifyPositive("Berhasil diedit")
+          this.$notifyPositive("Berhasil " + ed)
           this.showEdit = false
         }).catch((error) => {
           // console.log(error)
-          this.$notifyNegative("Gagal diedit")
+          this.$notifyNegative("Gagal " + ed)
         })
     },
     onDelete() {

@@ -17,6 +17,7 @@ class CreateInvoiceDetailsTable extends Migration
             $table->increments('id');
             $table->integer('id_order')->unsigned();
             $table->integer('id_invoice')->unsigned();
+            $table->timestamps('lunas_at');
 
             $table->timestamps();
         });

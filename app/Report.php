@@ -18,8 +18,32 @@ class Report extends Model
     }
 
     public static function customer($method,$from,$to,$fCust = null) {
+
+        $terlarisBy = [];
+        if ($from != null) $terlarisBy[] = "o.tanggal >= '" . $from . "'";
+        if ($to != null) $terlarisBy[] = "o.tanggal <= '" . $to . "'";
+        $terlarisBy = implode(" AND ", $terlarisBy);
+        if (empty($terlarisBy)) $terlarisBy = "true";
+
+        $customerTerlaris = <<<TERLARIS
+(select nama_produk from	
+(select o.id_customer,
+od.id_produk,
+p.nama as nama_produk,
+sum(qty) as total
+from `order` o 
+inner join order_detail od on o.id = od.id_order
+inner join produk p on p.id = od.id_produk
+where %s
+group by o.id_customer, od.id_produk, p.nama
+order by sum(qty) desc) x 
+where customer.id = x.id_customer
+limit 1) as terlaris
+TERLARIS;
+        $customerTerlaris = sprintf($customerTerlaris, $terlarisBy);
+
         $order = Order::query();
-        $customer = Customer::select('id','nama');
+        $customer = Customer::select('id','nama', DB::raw($customerTerlaris));
         $detail = Order::select('id',DB::raw('SUM(qty) as qty'),DB::raw('SUM((100-diskon)/100*qty*harga) as nilai'))
             ->joinModel(OrderDetail::select('id_order','qty','diskon','harga'),'ordtl','ordtl.id_order','order.id')
             ->groupBy('order.id');
@@ -43,7 +67,7 @@ class Report extends Model
             $tanggal = "2000";
         }
 
-        $result = $result->select(DB::raw($tanggal . ' as date'),'order.id_customer','cust.nama',
+        $result = $result->select(DB::raw($tanggal . ' as date'),'order.id_customer','cust.nama', 'cust.terlaris',
                                 DB::raw('SUM(qty) as qty'),DB::raw('SUM(terbayar) as terbayar'),
                                 DB::raw('SUM(nilai) as nilai'));
         
@@ -54,6 +78,52 @@ class Report extends Model
         // dd($result->get()->toArray());
         return $result;
     }
+
+    public static function customerproduk($method,$from,$to,$fCust = null) {
+        $order = Order::query();
+        $customer = Customer::select('id','nama');
+        $detail = Order::select('id','id_produk','prod.nama as nama_produk',DB::raw('SUM(qty) as qty'),DB::raw('SUM((100-diskon)/100*qty*harga) as nilai'))
+            ->joinModel(OrderDetail::select('id_order','id_produk','qty','diskon','harga'),'ordtl','ordtl.id_order','order.id')
+            ->joinModel(Produk::select('nama','id as idp'),'prod','ordtl.id_produk','prod.idp')
+            ->groupBy('order.id')
+            ->groupBy('ordtl.id_produk')
+            ->groupBy('prod.nama');
+
+        $result = $order->joinModel($customer,'cust','cust.id','order.id_customer')
+            ->leftJoinModel($detail,'dtl','dtl.id','order.id');
+
+        if ($method === 'y') {
+            $result = $result->groupBy('date','id_customer','nama','id_produk','nama_produk')->orderBy('date')->orderBy('nama');
+            $tanggal = "CONCAT(YEAR(tanggal),'-01-01')";
+        } else if ($method === 'm') {
+            $result = $result->groupBy('date','id_customer','nama','id_produk','nama_produk')->orderBy('date')->orderBy('nama');
+            $tanggal = "CONCAT(DATE_FORMAT(tanggal, '%Y-%m'),'-01')";
+        } else if ($method === 'd') {
+            $result = $result->groupBy('date','id_customer','nama','id_produk','nama_produk')->orderBy('date')->orderBy('nama');
+            $tanggal = "order.tanggal";
+        } else if ($method === 'a') {
+            $result = $result->groupBy('date','id_customer','nama','id_produk','nama_produk')->orderBy('nama');
+            $tanggal = "2000";
+        }
+
+        $result = $result->select(
+            DB::raw($tanggal . ' as date'),
+            'order.id_customer',
+            'cust.nama',
+            'dtl.id_produk',
+            'dtl.nama_produk',
+            DB::raw('SUM(qty) as qty'),
+            DB::raw('SUM(nilai) as nilai')
+        );
+        
+        if ($from != null) $result = $result->whereDate('tanggal','>=',$from);
+        if ($to != null) $result = $result->whereDate('tanggal','<=',$to);
+        if ($fCust != null) $result = $result->where('id_customer',$fCust);
+
+        // dd($result->get()->toArray());
+        return $result;
+    }
+
 
     public static function produk($method,$from,$to,$fProd = null) {
         $order = Order::query();
@@ -158,6 +228,49 @@ class Report extends Model
             $to = $to == null ? '' : $to;
             $sheet->setHeaderMeta("tgl","Tanggal {$from} s/d {$to}",'#000000',10,"right");
             // public function setHeaderMeta($meta,$string,$color="#000000",$size=12,$align="center",$weight="normal") {
+        }
+        $sheet->setData($reportDataGet,'#808080','#ffffff');
+        
+        ExcelHelper::render();
+    }
+
+    
+    public static function excelCustomerproduk($method,$from,$to,$fCust = null) {
+        $reportData = self::envelop(self::customerproduk($method,$from,$to, $fCust));
+        if ($method === 'd')
+            $reportData = $reportData->select('date as TANGGAL','nama as CUSTOMER','nama_produk as NAMA_PRODUK','qty as JUMLAH_PRODUK','nilai as NILAI_ORDER');
+        else if ($method === 'm')
+            $reportData = $reportData->select(DB::raw("DATE_FORMAT(date,'%Y-%m') as BULAN"),'nama as CUSTOMER','nama_produk as NAMA_PRODUK','qty as JUMLAH_PRODUK','nilai as NILAI_ORDER');
+        else if ($method === 'y')
+            $reportData = $reportData->select(DB::raw("YEAR(date) as TAHUN"),'nama as CUSTOMER','nama_produk as NAMA_PRODUK','qty as JUMLAH_PRODUK','nilai as NILAI_ORDER');
+        else
+            $reportData = $reportData->select('nama as CUSTOMER','nama_produk as NAMA_PRODUK','qty as JUMLAH_PRODUK','nilai as NILAI_ORDER');
+
+        $reportDataGet = $reportData->get()
+            ->map(function ($item, $key) {
+                return (array) $item;
+            })
+            ->all();
+
+        $sheet = new ExcelHelper("Produk Per Customer");
+        $sheet->setTitle('Laporan Produk Per Customer');
+        if ($method === 'd')
+            $sheet->setSubTitle("Harian");
+        else if ($method === 'm')
+            $sheet->setSubTitle("Bulanan");
+        else if ($method === 'y')
+            $sheet->setSubTitle("Tahunan");
+
+        if ($from !== null || $to !== null) {
+            $from = $from == null ? '' : $from;
+            $to = $to == null ? '' : $to;
+            $sheet->setHeaderMeta("tgl","Tanggal {$from} s/d {$to}",'#000000',10,"right");
+            // public function setHeaderMeta($meta,$string,$color="#000000",$size=12,$align="center",$weight="normal") {
+        }
+        if ($fCust != null) {
+            $cust = Customer::find($fCust);
+            $sheet->setHeaderMeta("cust","Customer {$cust->nama}",'#000000',10,"right");
+            $sheet->setTitle("Laporan Produk Per {$cust->nama}");
         }
         $sheet->setData($reportDataGet,'#808080','#ffffff');
         

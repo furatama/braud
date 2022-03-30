@@ -7,12 +7,14 @@ use App\Produk;
 use App\Kategori;
 use App\Satuan;
 use App\Harga;
+use App\Customer;
+use DB;
 
 class ProdukController extends Controller
 {
     public function index()
     {        
-        $produkData = Produk::select('*');
+        $produkData = Produk::selectRaw('*, CAST(produk.harga_global AS SIGNED) as harga_global');
         $kategoriData = Kategori::select('id as id_kategori','nama as kategori');
         $satuanData = Satuan::select('id as id_satuan','nama as satuan');
 
@@ -39,18 +41,20 @@ class ProdukController extends Controller
 
     public function store(Request $request)
     {
-        $data = (new Produk)->record($request);      
+        $data = (new Produk)->record($request);
+        $this->_updateHargaCustomer($request, $data->id);
         return bd_json($data);
     }
 
     public function show($id)
     {
-        $data = Produk::find($id);
+        $data = Produk::selectRaw('*, CAST(produk.harga_global AS SIGNED) as harga_global')->find($id);
         return bd_json($data);
     }
 
     public function update(Request $request, $id)
     {
+        $this->_updateHargaCustomer($request, $id);
         $data = Produk::find($id)->record($request);
         return bd_json($data);
     }
@@ -76,6 +80,23 @@ class ProdukController extends Controller
     {        
         $data = Produk::select('id','nama')->orderBy('nama');
         return bd_json($data);
+    }
+
+    private function _updateHargaCustomer($request, $id_produk = null) {
+        if ($request->harga_global > 0) {
+            $harga = Customer::all()->map(function($item) use ($id_produk, $request) {
+                return [
+                    'id_customer' => $item->id,
+                    'id_produk' => $id_produk,
+                    'harga' => $request->harga_global
+                ];
+            });
+
+            DB::transaction(function () use ($harga, $id_produk) {
+                Harga::where('id_produk',$id_produk)->delete();
+                Harga::massRecord($harga);
+            });
+        }
     }
 
 

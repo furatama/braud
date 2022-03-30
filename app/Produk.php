@@ -14,6 +14,6 @@ class Produk extends Model
 
     protected $hidden = ['deleted_at', 'created_at','updated_at'];
 
-    protected $fillable = ['kode','nama','id_satuan','id_kategori','keterangan','aktif'];
+    protected $fillable = ['kode','nama','id_satuan','id_kategori','keterangan','aktif','harga_global'];
 
 }

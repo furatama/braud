@@ -15,4 +15,9 @@ class Customer extends Model
     protected $hidden = ['deleted_at', 'created_at','updated_at'];
 
     protected $fillable = ['nama','alamat','telepon','email','keterangan','aktif'];
+
+    public function harga()
+    {
+        return $this->hasMany('App\Harga');
+    }
 }

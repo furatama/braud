@@ -103,10 +103,12 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('kredit/order/{id_order}', 'KreditController@showByIDOrder');
 
     Route::get('report/customer','ReportController@customer');
+    Route::get('report/customerproduk','ReportController@customerproduk');
     Route::get('report/produk','ReportController@produk');
     Route::get('report/order','ReportController@order');
 
     Route::get('report/customer/excel','ReportController@customerExcel');
+    Route::get('report/customerproduk/excel','ReportController@customerprodukExcel');
     Route::get('report/produk/excel','ReportController@produkExcel');
     Route::get('report/order/excel','ReportController@orderExcel');
 

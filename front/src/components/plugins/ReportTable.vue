@@ -157,7 +157,7 @@ export default {
   },
   methods: {
     applyFilter() {
-      // setTimeout(() => {  
+      // setTimeout(() => {
         this.aFilters.forEach((v,i) => {
           if (this.pFilters[v.name])
             this.aFilters[i].value = this.pFilters[v.name]
@@ -181,7 +181,7 @@ export default {
           this.data = tabledata.data
           this.pagination.page = tabledata.current_page
           this.pagination.rowsPerPage = tabledata.per_page
-          this.pagination.rowsNumber = tabledata.total          
+          this.pagination.rowsNumber = tabledata.total
           this.pagination.sortBy = pagination.sortBy
           this.pagination.descending = pagination.descending
           this.reformat()
@@ -211,7 +211,7 @@ export default {
         jenis = "[Keseluruhan]"
       }
 
-      
+
       if (this.filterDari && this.filterSampai)
         this.titleComputed = `${this.title} ${jenis} [${this.$date.formatDate(this.filterDari,'DD/MM/YYYY')} ~ ${this.$date.formatDate(this.filterSampai,'DD/MM/YYYY')}]`
       else if (this.filterDari)
@@ -226,6 +226,7 @@ export default {
         method: this.filter,
         from: this.filterDari || null,
         to: this.filterSampai || null,
+        ...this.pFilters
       }
       this.$store.dispatch("getXLS",{url: this.resourceURL + '/excel', params, filename: this.titleComputed})
     },

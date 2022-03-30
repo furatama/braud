@@ -426,7 +426,7 @@ export default {
     },
     resetForm() {
       this.loadNoOrder()
-      this.order.tanggal = this.$date.formatDate(Date.now(),'YYYY/MM/DD')
+      this.order.tanggal = this.$date.formatDate(this.$date.addToDate(new Date(), { days: 1 }),'YYYY/MM/DD')
       this.order.customer = ''
       this.table.data = []
       this.refreshGrandTotal()

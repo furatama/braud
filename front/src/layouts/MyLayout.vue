@@ -17,7 +17,7 @@
           Braud Artisan Bakery
         </q-toolbar-title>
 
-        <div>v1.6</div>
+        <div>v1.7.0322</div>
       </q-toolbar>
     </q-header>
 
@@ -39,7 +39,7 @@
               </q-item-section>
               <q-item-section>{{link.label}}</q-item-section>
             </q-item>
-            <q-expansion-item 
+            <q-expansion-item
               v-if="link.child && (roleChecker(link.role))"
               :icon="link.icon"
               :label="link.label"
@@ -75,7 +75,7 @@
             <q-separator v-if="roleChecker(link.role)" :key="'sep' + link.label" />
           </template>
 
-          
+
         </q-list>
       </q-scroll-area>
 
@@ -92,7 +92,7 @@
               </div>
             </div>
           </div>
-          
+
         </div>
       </div>
     </q-drawer>
@@ -123,7 +123,7 @@ export default {
   },
   methods: {
     roleChecker(role) {
-      if (this.role === 'superadmin') 
+      if (this.role === 'superadmin')
         return true
       return (role && role.includes(this.role)) || !role
     }
@@ -146,7 +146,7 @@ export default {
         to: '/order',
         icon: 'list_alt',
         role: ['admin','kasir']
-      },      
+      },
       {
         label: 'Invoice',
         icon: 'insert_drive_file',
@@ -163,6 +163,7 @@ export default {
           {label: 'Customer', to: '/report/customer'},
           {label: 'Order', to: '/report/order'},
           {label: 'Produk', to: '/report/produk'},
+          {label: 'Produk Per Cust', to: '/report/customerproduk'},
         ],
         role: ['admin','kasir']
       },
@@ -181,7 +182,7 @@ export default {
           {label: 'Resep', to: '/master/resepproduk', role: ['admin','bakery']},
           {label: 'Resep Detail', to: '/master/resepdetail', role: ['admin','bakery']},
           // {label: 'Bahan', to: '/master/bahan', role: ['admin','bakery']},
-          // {label: 'Staff', to: '/master/staff', role: ['admin']},
+          {label: 'Staff', to: '/master/staff', role: ['admin']},
 				]
       },
     ]

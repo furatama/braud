@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-    <m-table  
+    <m-table
       title="Master Produk"
       :columns="columns"
       :resourceURL="resourceURL"
@@ -24,6 +24,7 @@ export default {
       columns: [
         { name: 'kode', label: 'Kode', type: 'string'},
         { name: 'nama', label: 'Nama', type: 'string'},
+        { name: 'harga_global', label: 'Harga Global', type: 'decimal'},
         { name: 'kategori', label: 'Kategori', type: 'string'},
         { name: 'satuan', label: 'Satuan', type: 'string' },
         { name: 'aktif', label: 'Aktif?', type: 'boolean' },
@@ -39,6 +40,7 @@ export default {
         }},
         { name: 'keterangan', label: 'Keterangan', type: 'textarea'},
         { name: 'aktif', label: 'Aktif?', type: 'toggle', default: 1 },
+        { name: 'harga_global', label: 'Harga Global', type: 'decimal'},
       ]
     }
   }

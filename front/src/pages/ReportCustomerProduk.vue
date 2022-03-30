@@ -1,7 +1,7 @@
 <template>
   <q-page padding>
     <report-table
-      title="Report Customer"
+      title="Report Produk Per Customer"
       :columns="columns"
       :resourceURL="link"
       :addFilters="filters"
@@ -18,14 +18,13 @@ export default {
   },
   data() {
     return {
-      link: 'report/customer',
+      link: 'report/customerproduk',
       columns: [
         { name: 'date', label: 'Tanggal', type: 'date'},
         { name: 'nama', label: 'Customer', type: 'string'},
-        { name: 'terlaris', label: 'Produk Terlaris', type: 'string'},
+        { name: 'nama_produk', label: 'Produk', type: 'string'},
         { name: 'qty', label: 'Jumlah Produk', type: 'integer'},
-        { name: 'nilai', label: 'Nilai Order', type: 'decimal'},
-        { name: 'terbayar', label: 'Terbayar', type: 'decimal'}
+        { name: 'nilai', label: 'Nilai Order', type: 'decimal'}
       ],
       filters: [
         { name: 'customer', label: 'Customer', type: 'select', options: []},

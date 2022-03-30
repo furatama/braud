@@ -34,9 +34,10 @@ class Invoice extends Model
             LEFT JOIN (
                 SELECT id_order, SUM((100-diskon)/100*qty*harga) as total
                 FROM order_detail
+                WHERE deleted_at IS NULL
                 GROUP BY id_order
             ) od ON od.id_order = order.id
-            GROUP BY invoice.id, customer.nama, catatan
+            GROUP BY invoice.id, invoice.tanggal, customer.id, lunas_at, customer.nama, catatan
         ) tbl"));
         return $data;
     }

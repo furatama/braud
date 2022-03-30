@@ -79,11 +79,12 @@ class ResepProdukController extends Controller
             ->get()
             ->map(function ($items) use($resep) {
                 $arr = $items->toArray();
-                $arr['detail'] = (clone $resep)
-                ->where('id_resep',$arr['id'])
-                ->orderBy('ratio')
-                ->get()
-                ->toArray();
+                $cResep = clone $resep;
+                $arr['detail'] = $cResep
+                    ->where('id_resep',$arr['id'])
+                    ->orderBy('ratio')
+                    ->get()
+                    ->toArray();
                 return $arr;
             });
         return bd_json($data);

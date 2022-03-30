@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Customer;
 use App\Harga;
+use App\Produk;
 
 class CustomerController extends Controller
 {
@@ -24,7 +25,9 @@ class CustomerController extends Controller
 
     public function store(Request $request)
     {
-        $data = (new Customer)->record($request);      
+        $data = (new Customer)->record($request);
+        $this->_updateHargaCustomer($data->id);
+
         return bd_json($data);
     }
 
@@ -60,6 +63,17 @@ class CustomerController extends Controller
         Harga::where('id_customer',$id)->delete();
         $data = Harga::massRecord($request->harga);
         return bd_json($data);
+    }
+
+    private function _updateHargaCustomer($id_customer) {
+        $harga = Produk::where('harga_global', '>', 0)->get()->map(function($item) use ($id_customer) {
+            return [
+                'id_customer' => $id_customer,
+                'id_produk' => $item->id,
+                'harga' => $item->harga_global
+            ];
+        });
+        Harga::massRecord($harga);
     }
     
 }

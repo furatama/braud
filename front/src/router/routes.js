@@ -13,6 +13,7 @@ const routes = [
       { path: 'invoice-lunas', component: () => import('pages/InvoiceLunas.vue'), meta: {role: ['admin','kasir']} },
       { path: 'resep', component: () => import('pages/ResepProduk.vue'), meta: {role: ['admin','bakery']} },
       { path: 'report/customer', component: () => import('pages/ReportCustomer.vue'), meta: {role: ['admin','kasir']} },
+      { path: 'report/customerproduk', component: () => import('pages/ReportCustomerProduk.vue'), meta: {role: ['admin','kasir']} },
       { path: 'report/produk', component: () => import('pages/ReportProduk.vue'), meta: {role: ['admin','kasir']} },
       { path: 'report/order', component: () => import('pages/ReportOrder.vue'), meta: {role: ['admin','kasir']} },
       { path: 'master/customer', component: () => import('pages/MasterCustomer.vue'), meta: {role: ['admin','kasir']} },

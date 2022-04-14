@@ -84,17 +84,8 @@ class ProdukController extends Controller
 
     private function _updateHargaCustomer($request, $id_produk = null) {
         if ($request->harga_global > 0) {
-            $harga = Customer::all()->map(function($item) use ($id_produk, $request) {
-                return [
-                    'id_customer' => $item->id,
-                    'id_produk' => $id_produk,
-                    'harga' => $request->harga_global
-                ];
-            });
-
-            DB::transaction(function () use ($harga, $id_produk) {
-                Harga::where('id_produk',$id_produk)->delete();
-                Harga::massRecord($harga);
+            DB::transaction(function () use ($request, $id_produk) {
+                $harga = Harga::where('id_produk',$id_produk)->update(['harga' => $request->harga_global]);
             });
         }
     }

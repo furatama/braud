@@ -94,6 +94,7 @@
 
 <script>
 import SelectFilter from './SelectFilter'
+import { LocalStorage } from 'quasar'
 
 export default {
   components: {
@@ -175,6 +176,19 @@ export default {
         ...this.pFilters
       }
 
+      let cache = LocalStorage.getItem('REPORT_' + this.resourceURL + '.' + JSON.stringify(params))
+      if (!cache)
+        cache = LocalStorage.getItem('REPORT_' + this.resourceURL)
+      if (cache) {
+        let tabledata = JSON.parse(cache)
+        this.data = tabledata.data
+        this.pagination.page = tabledata.current_page
+        this.pagination.rowsPerPage = tabledata.per_page
+        this.pagination.rowsNumber = tabledata.total
+        this.pagination.sortBy = pagination.sortBy
+        this.pagination.descending = pagination.descending
+        this.reformat()
+      }
       this.$store.dispatch("fetchPaginate",{url: this.resourceURL, pagination, params})
         .then((data) => {
           let tabledata = data.data
@@ -185,6 +199,8 @@ export default {
           this.pagination.sortBy = pagination.sortBy
           this.pagination.descending = pagination.descending
           this.reformat()
+          LocalStorage.set('REPORT_' + this.resourceURL, JSON.stringify(tabledata))
+          LocalStorage.set('REPORT_' + this.resourceURL + '.' + JSON.stringify(params), JSON.stringify(tabledata))
         }).catch((error) => {
           console.log(error)
           this.$notifyNegative('Ada Sebuah Kesalahan')

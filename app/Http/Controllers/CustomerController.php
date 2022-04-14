@@ -26,7 +26,7 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         $data = (new Customer)->record($request);
-        $this->_updateHargaCustomer($data->id);
+        // $this->_updateHargaCustomer($data->id);
 
         return bd_json($data);
     }

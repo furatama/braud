@@ -13,7 +13,7 @@
       :rows-per-page-options="rpp"
       class="bg-secondary text-anti-primary"
       table-class="no-scroll bg-accent text-primary"
-      :hide-header="!loading"
+      :hide-header="true"
     >
       <template v-slot:top-right>
         <div class="row q-col-gutter-md">
@@ -21,7 +21,7 @@
         </div>
       </template>
       <template v-slot:top-row="props">
-        <q-tr v-if="!loading" :props="props">
+        <q-tr :props="props">
           <q-td v-for="(col,index) in props.cols" :key="index">
             <template v-if="col.type == 'string' || col.type == 'decimal' || col.type == 'integer'">
               <q-input debounce="300" v-model="col.filter" style="height:12px" input-style="padding:0px;font-size:12px" dense :placeholder="`${col.label}`"/>
@@ -94,7 +94,7 @@
             <q-tooltip>Close</q-tooltip>
           </q-btn>
         </q-bar>
-        
+
         <q-card-section class="q-pa-none q-ma-none">
           <q-scroll-area style="height:85vh" class="q-px-md">
             <component @closeDialog="componentDialog = false" class="q-pa-md" :data="component.data" :is="component.component"></component>
@@ -137,14 +137,14 @@ export default {
   },
   computed: {
     loading: {
-      get() { 
-        return this.$store.state.loading 
+      get() {
+        return this.$store.state.loading
       },
       set(value) {
-        if (value) { 
-          this.$store.commit("loadingStart") 
-        } else { 
-          this.$store.commit("loadingEnd") 
+        if (value) {
+          this.$store.commit("loadingStart")
+        } else {
+          this.$store.commit("loadingEnd")
         }
       }
     },
@@ -168,7 +168,7 @@ export default {
     onRequest(props = this) {
       let pagination = props.pagination || this.pagination
       let cols = props.cols || this.cols
-      let colFilter = {} 
+      let colFilter = {}
       cols.forEach((el) => {
         if (el.type && el.type != 'dialog') {
           colFilter[el.name] = el.filter
@@ -185,7 +185,7 @@ export default {
         this.nomor = data.from
         this.pagination.page = data.current_page
         this.pagination.rowsPerPage = data.per_page
-        this.pagination.rowsNumber = data.total          
+        this.pagination.rowsNumber = data.total
       }).catch((error) => {
         console.log(error)
       }).finally(() => {
@@ -232,7 +232,7 @@ export default {
       ...this.cols,
     ]
   },
-  mounted () {    
+  mounted () {
     // this.rerequest()
 
     // this.defInps = this.inputs.map((input,index) => {

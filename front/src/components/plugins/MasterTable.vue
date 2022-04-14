@@ -13,7 +13,7 @@
       :rows-per-page-options="rpp"
       class="bg-secondary text-anti-primary"
       table-class="no-scroll bg-accent text-primary"
-      :hide-header="!loading"
+      :hide-header="true"
     >
       <template v-slot:top-right>
         <div class="row q-col-gutter-md">
@@ -26,7 +26,7 @@
         </div>
       </template>
       <template v-slot:top-row="props">
-        <q-tr v-if="!loading" :props="props">
+        <q-tr :props="props">
           <q-td v-for="(col,index) in props.cols" :key="index">
             <template v-if="col.type == 'boolean'">
               <q-toggle checked-icon="check" unchecked-icon="clear" :true-value="1" :false-value="0" v-model="col.filter" color="primary" dense style="margin-left:-15px"/>
@@ -73,8 +73,8 @@
 
     <q-btn dense class="q-px-sm top-btn" rounded icon="add" label="data" color="positive" @click="onNew()" />
 
-    <!--  -->    
-    
+    <!--  -->
+
     <q-dialog v-model="formDialog">
       <q-card style="min-width:40vw">
         <q-bar class="bg-primary text-white">
@@ -98,7 +98,7 @@
             </template>
             <template v-else-if="input.type == 'number'">
               <q-input type="number" :label="input.label" v-model.number="input.value" />
-            </template>            
+            </template>
             <template v-else-if="input.type == 'decimal'">
               <q-input type="number" :label="input.label" v-model.number="input.value" step="0.01" />
             </template>
@@ -133,7 +133,7 @@
                   <q-btn round dense flat icon="add" @click="showResource(input,index)" />
                 </template>
               </select-filter>
-            </template>              
+            </template>
             <template v-else-if="input.type == 'detail'">
               <mtd v-model="input.value" :detail="input.detail" >
               </mtd>
@@ -162,7 +162,7 @@
             <q-tooltip>Close</q-tooltip>
           </q-btn>
         </q-bar>
-        
+
         <q-card-section class="q-pa-none q-ma-none">
           <div class="scroll q-pa-md" style="height:85vh">
             <component :is="resource.component"></component>
@@ -184,7 +184,7 @@
             <q-tooltip>Close</q-tooltip>
           </q-btn>
         </q-bar>
-        
+
         <q-card-section class="q-pa-none q-ma-none">
           <q-scroll-area style="height:85vh" class="q-px-md">
             <component class="q-pa-md" :data="component.data" :is="component.component"></component>
@@ -238,14 +238,14 @@ export default {
   },
   computed: {
     loading: {
-      get() { 
-        return this.$store.state.loading 
+      get() {
+        return this.$store.state.loading
       },
       set(value) {
-        if (value) { 
-          this.$store.commit("loadingStart") 
-        } else { 
-          this.$store.commit("loadingEnd") 
+        if (value) {
+          this.$store.commit("loadingStart")
+        } else {
+          this.$store.commit("loadingEnd")
         }
       }
     },
@@ -273,7 +273,7 @@ export default {
     onRequest (props) {
       let { page, rowsPerPage, rowsNumber, sortBy, descending } = props.pagination
       let filter = props.filter
-      let colFilter = {} 
+      let colFilter = {}
       let cols = props.cols || this.cols
       cols.forEach((el) => {
         if (el.type && el.type != 'dialog')
@@ -289,7 +289,7 @@ export default {
           this.nomor = tabledata.from
           this.pagination.page = tabledata.current_page
           this.pagination.rowsPerPage = tabledata.per_page
-          this.pagination.rowsNumber = tabledata.total          
+          this.pagination.rowsNumber = tabledata.total
         }).catch((error) => {
           console.log(error)
           this.$notifyNegative('Ada Sebuah Kesalahan')
@@ -452,7 +452,7 @@ export default {
       {name: 'action', label: '', sortable: false}
     ]
   },
-  mounted () {    
+  mounted () {
     // this.rerequest()
 
     this.watchForm()

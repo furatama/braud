@@ -17,7 +17,7 @@
           Braud Artisan Bakery
         </q-toolbar-title>
 
-        <div>v1.7.0322</div>
+        <div>v1.8.0422</div>
       </q-toolbar>
     </q-header>
 

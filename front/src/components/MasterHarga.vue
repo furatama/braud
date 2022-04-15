@@ -8,7 +8,7 @@
     <div class="row" style="height:auto">
       <div class="col-6 row q-col-gutter-md" v-for="(row,index) in listHarga" :key="index">
         <div class="q-mt-md"><q-avatar size="20px" class="q-ma-none q-pa-none text-anti-primary" color="primary">{{index+1}}</q-avatar></div>
-        <div><select-filter label="Nama Produk" v-model="row.produk" :options="produkOpts" style="width:225px"/></div>
+        <div><select-filter label="Nama Produk" v-model="row.produk" :options="produkOpts" @input="setDefaultHarga(index)" style="width:225px"/></div>
         <div><q-input @focus="(evt) => {evt.target.select()}" type="number" label="Harga" v-model="row.harga" style="width:80px" input-class="text-right"/></div>
         <div class="q-mt-md">
           <q-btn flat dense icon="delete" color="negative" @click="removeHarga(index)"/>
@@ -53,7 +53,7 @@ export default {
   computed: {
     loading: {
       get() {
-        return this.$store.state.loading 
+        return this.$store.state.loading
       }
     }
   },
@@ -77,7 +77,8 @@ export default {
             return {
               label: v.aktif == 1 ? v.nama : v.nama + ' (<b>NONAKTIF</b>)',
               value: v.id,
-              aktif: v.aktif
+              aktif: v.aktif,
+              harga: v.harga_global
             }
           })
         }).catch((error) => {
@@ -87,7 +88,7 @@ export default {
     },
     onSubmit() {
       let dups = this.$array_duplicate(this.listHarga,(item) => item.produk.value ? item.produk.value : item.produk)
-      
+
       if (dups.length > 0) {
         this.$notifyNegative("Ada item yang sama")
         return
@@ -124,7 +125,10 @@ export default {
           console.log(error)
           this.$notifyNegative("Gagal Mengambil Data Harga")
         })
-    }
+    },
+    setDefaultHarga(index) {
+      this.listHarga[index].harga = this.$numeralVal(this.listHarga[index].produk.harga)
+    },
   },
   mounted() {
     setTimeout(() => {

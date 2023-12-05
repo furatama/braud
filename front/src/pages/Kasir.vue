@@ -4,7 +4,8 @@
       <div class="col-9">
         <div class="row q-gutter-sm">
           <q-input v-show="false" v-model="order.no" readonly outlined label="No Order" :loading="loading" />
-          <q-input v-model="order.tanggal" outlined label="Tanggal Order" mask="####/##/##" placeholder="YYYY/MM/DD">
+          <select-filter class="col-10" outlined label="Customer" v-model="order.customer" :options="order.customerOpts" :loading="loading"/>
+          <q-input class="col-3" v-model="order.tanggal" outlined label="Tanggal Order" mask="####/##/##" placeholder="YYYY/MM/DD">
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
                 <q-popup-proxy>
@@ -13,7 +14,16 @@
               </q-icon>
             </template>
           </q-input>
-          <q-input v-model="order.due" outlined label="Jatuh Tempo (Credit Only)" mask="####/##/##" placeholder="YYYY/MM/DD">
+          <q-input class="col-3" v-model="order.tgl_kirim" outlined label="Tanggal Kirim" mask="####/##/##" placeholder="YYYY/MM/DD">
+            <template v-slot:append>
+              <q-icon name="event" class="cursor-pointer">
+                <q-popup-proxy>
+                  <q-date v-model="order.tgl_kirim"/>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+          </q-input>
+          <q-input class="col-3" v-model="order.due" outlined label="Jatuh Tempo (Credit Only)" mask="####/##/##" placeholder="YYYY/MM/DD">
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
                 <q-popup-proxy>
@@ -22,7 +32,6 @@
               </q-icon>
             </template>
           </q-input>
-          <select-filter class="col-5" outlined label="Customer" v-model="order.customer" :options="order.customerOpts" :loading="loading"/>
         </div>
         <q-separator class="q-my-sm"/>
 
@@ -33,7 +42,7 @@
           dense
           class="my-sticky-header-table"
           :pagination.sync="table.pagination"
-          no-data-label="Belum Ada Produk"            
+          no-data-label="Belum Ada Produk"
         >
           <template v-slot:body="props">
             <q-tr :props="props" :style="`background-color:rgba(255,255,0,${props.row.bg})`">
@@ -63,8 +72,15 @@
           </template>
           <template v-slot:bottom>
             <div class="row full-width justify-end">
-              <div>
+              <div class="row q-gutter-sm">
                 <div style="margin-right:48px" class="text-right">
+                  <q-input @focus="selectAll" min="0" max="100" type="number" dense v-model="table.tax" input-class="text-right" style="width:50px;float:right" label="Tax">
+                    <template v-slot:after>
+                      <span class="text-body2">%</span>
+                    </template>
+                  </q-input>
+                </div>
+                <div style="margin-right:48px;margin-top:20px" class="text-right">
                   <span class="">Rp</span>
                   <span class="text-h5">{{$numeralCurrency(table.grandTotal)}}</span>
                 </div>
@@ -76,8 +92,9 @@
         <div class="row q-mt-sm justify-between">
           <q-btn :disabled="table.data.length <= 0" label="RESET" color="info" icon="refresh" @click="() => {resetForm()}"/>
           <div class="row q-col-gutter-md">
-            <div class="q-mr-md"><q-btn :disabled="table.data.length <= 0" label="CHECKOUT CREDIT" color="teal" icon="credit_card" @click="addOrder('credit')"/></div>
-            <div><q-btn :disabled="table.data.length <= 0" label="CHECKOUT CASH" color="green" icon="monetization_on" @click="addOrder('cash')"/></div>
+            <div class="q-mr-sm"><q-btn :disabled="table.data.length <= 0 || order.due === null" label="CREDIT" color="teal" icon="credit_card" @click="addOrder('credit')"/></div>
+            <div class="q-mr-sm"><q-btn :disabled="table.data.length <= 0" label="CASH" color="green" icon="monetization_on" @click="addOrder('cash')"/></div>
+            <div><q-btn :disabled="table.data.length <= 0" label="TRANSFER" color="blue" icon="send" @click="addOrder('transfer')"/></div>
           </div>
         </div>
 
@@ -89,7 +106,7 @@
         <div class="q-pt-sm">
           <q-list bordered separator class="bg-accent" >
             <q-item dark class="bg-primary">
-              <q-item-section>      
+              <q-item-section>
                 <q-input dark outlined dense debounce="300" v-model="filter" placeholder="Filter Produk">
                   <template v-slot:append>
                     <q-icon name="search" />
@@ -129,7 +146,7 @@
             <q-tooltip>Close</q-tooltip>
           </q-btn>
         </q-bar>
-        
+
         <q-card-section>
           <q-input label="Total Harga" :value="$numeralCurrency(table.grandTotal)" readonly input-class="text-right text-h5"/>
           <div class="row q-my-sm">
@@ -152,29 +169,29 @@
 
         <q-card-actions align="right" class="bg-primary text-white">
           <q-btn
-            label="CETAK ORDER" 
-            color="positive" 
-            bordered 
+            label="CETAK ORDER"
+            color="positive"
+            bordered
             icon="print"
-            :disable="(exchange < 0 && payment.method == 'cash') || (exchange > 0 && payment.method == 'credit')" 
+            :disable="(exchange < 0 && payment.method == 'cash') || (exchange > 0 && payment.method == 'credit')"
             @click="() => {submitOrder(); printOrder();}"
           >
           </q-btn>
-          
+
         </q-card-actions>
       </q-card>
     </q-dialog>
     <!-- <div class="absolute-bottom full-width bg-accent shadow-3">
       asdf
     </div> -->
-    <print-out 
-      ref="printer" 
+    <print-out
+      ref="printer"
       :data="printData"
     />
-      <!-- :data="table.data" 
-      :total="table.grandTotal" 
-      :cash="paidAmount" 
-      :exchange="exchange" 
+      <!-- :data="table.data"
+      :total="table.grandTotal"
+      :cash="paidAmount"
+      :exchange="exchange"
       :date="$date.formatDate(Date.now(), 'DD.MM.YY-HH:mm')" -->
   </q-page>
 </template>
@@ -194,7 +211,8 @@ export default {
       order: {
         no: '',
         tanggal: this.$date.formatDate(this.$date.addToDate(new Date(), { days: 1 }),'YYYY/MM/DD'),
-        due: this.$date.formatDate(this.$date.adjustDate(this.$date.addToDate(new Date(), {month: 1}), {date: 20}),'YYYY/MM/DD'),
+        due: null,//this.$date.formatDate(this.$date.adjustDate(this.$date.addToDate(new Date(), {month: 1}), {date: 20}),'YYYY/MM/DD'),
+        tgl_kirim: this.$date.formatDate(this.$date.addToDate(new Date(), { days: 1 }),'YYYY/MM/DD'),
         customer: '',
         customerOpts: [],
       },
@@ -211,7 +229,8 @@ export default {
           rowsPerPage: 0
         },
         data: [{},{}],
-        grandTotal: 0
+        grandTotal: 0,
+        tax: 10,
       },
       produkData: [],
       defProdukData: [],
@@ -225,13 +244,19 @@ export default {
         options: [
           {label: 'Cash', value: 'cash'},
           {label: 'Credit', value: 'credit'},
+          {label: 'Transfer', value: 'transfer'},
         ],
-      }
+      },
+      metodeMap: {
+        cash: 'Cash',
+        credit: 'Credit',
+        transfer: 'Transfer',
+      },
     }
   },
   computed: {
     loading() {
-      return this.$store.state.loading 
+      return this.$store.state.loading
     },
     displayExchange() {
       return this.payment.method === 'cash' ? this.$numeralCurrency(this.exchange) : this.$numeralCurrency(-this.exchange)
@@ -259,16 +284,18 @@ export default {
         no: this.order.no,
         tanggal: this.$date.formatDate(this.order.tanggal, 'DD/MM/YYYY'),
         due: this.$date.formatDate(this.order.due, 'DD/MM/YYYY'),
+        tgl_kirim: this.$date.formatDate(this.order.tgl_kirim, 'DD/MM/YYYY'),
         kasir: this.$store.getters.getName,
-        method: this.payment.method == 'cash' ? "CASH" : "CREDIT",
+        method: this.metodeMap[this.payment.method],
         cust: {
           nama: this.customerData.label,
           email: this.customerData.email,
           alamat: this.customerData.alamat,
           telepon: this.customerData.telepon,
         },
+        tax: Number(this.table.tax),
         total: this.$numeralCurrency(this.table.grandTotal),
-        tunaiLabel: this.payment.method == 'cash' ? "Terbayar" : "Kredit",
+        tunaiLabel: this.payment.method != 'credit' ? "Terbayar" : "Kredit",
         tunai: this.$numeralCurrency(this.payment.paid),
         sisaLabel: this.payment.method == 'cash' ? "Kembalian" : "Hutang",
         sisa: this.payment.method == 'cash' ? this.$numeralCurrency(this.exchange) : this.$numeralCurrency(-this.exchange),
@@ -288,6 +315,9 @@ export default {
     },
     filter() {
       this.produkData = this.$array_filter(this.defProdukData,this.filter,'nama')
+    },
+    "table.tax"() {
+      this.refreshGrandTotal()
     }
   },
   methods: {
@@ -319,7 +349,7 @@ export default {
           .then((data) => {
             let n = (Number(data.count) + 1)
             n = n > 999 ? n.toString(36) : n.toString()
-            this.order.no = "BA" + this.$date.formatDate(this.order.tanggal,"YYMMDD") + n.padStart(3,'0')
+            this.order.no = "BGS" + this.$date.formatDate(this.order.tanggal,"YYMMDD") + n.padStart(3,'0')
             resolve()
           }).catch((error) => {
             console.log(error)
@@ -368,7 +398,7 @@ export default {
         this.refreshGrandTotal()
       }
       alreadyRow.bg = 0.15
-      setTimeout(function() { 
+      setTimeout(function() {
         refs['qty'][row].focus()
         alreadyRow.bg = 0
       }, 100);
@@ -381,11 +411,12 @@ export default {
     },
     refreshGrandTotal() {
       let total = 0
+      const tax = this.table.tax
       this.table.data.forEach(v => {
         total += Number(v.subtotalN)
       });
-      this.table.grandTotal = total
-      console.log(this.table.grandTotal)
+      this.table.grandTotal = total * ((100 + Number(tax)) / 100)
+      console.log(tax, this.table.grandTotal)
     },
     addMoney(amount) {
       if (amount == 'clear')
@@ -401,10 +432,12 @@ export default {
         id_customer: this.customerData.value,
         metode: this.payment.method,
         tanggal: this.orderDate,
-        due: this.order.due,
+        tgl_kirim: this.order.tgl_kirim,
+        due: this.payment.method == 'credit' ? this.order.due : null,
         faktur: '',
         tunai: this.payment.paid,
         total: this.table.grandTotal,
+        tax: this.table.tax,
         keterangan: '',
         detail: this.table.data.map((v) => {
           return {
@@ -464,15 +497,15 @@ export default {
   .q-table th
     opacity: 1 !important
 
-  .q-item__section--main ~ .q-item__section--side 
+  .q-item__section--main ~ .q-item__section--side
     align-items: flex-end
     padding-right: 0
     padding-left: 1px
-  
-  input[type=number]::-webkit-inner-spin-button, 
-  input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none; 
-    margin-right: 2px; 
+
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin-right: 2px;
   }
 
 </style>

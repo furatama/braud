@@ -1,7 +1,7 @@
 <template>
   <div id="printMe" v-show="doPrint" >
     <div>
-      <table 
+      <table
         border="0" cellpadding="5px" cellspacing="0"
         :style="`
           font-family: ${po.font.one};
@@ -16,11 +16,11 @@
               src="~assets/print-logo.jpg"
               style="width:100px;"
             >
-            ARTISAN BAKERY
+            <!-- ARTISAN BAKERY -->
             <div style="height:2px"/>
           </td>
           <td style="vertical-align: middle; width:105px; text-align:right" rowspan="2">
-            
+
             <div style="
               font-weight:bold;
               font-size: 14px;
@@ -48,7 +48,7 @@
       </table>
       <div style=""/>
 
-      <table 
+      <table
         border="0" cellpadding="0px" cellspacing="0px"
         :style="`
           padding: 15px 0;
@@ -69,13 +69,18 @@
           <td style="padding: 0 5px"> : </td>
           <td>Payment of <b>{{nData}}</b> Invoice(s) from <b>{{dateFrom}}</b> to <b>{{dateTo}}</b></td>
         </tr>
+        <tr v-if="customerAlamat != ''" style="font-size: 14px; height: 25px">
+          <th align="right">ADDRESS</th>
+          <td style="padding: 0 5px"> : </td>
+          <td>{{customerAlamat}}</td>
+        </tr>
         <tr style="font-size: 14px; height: 25px">
           <th align="right">AMOUNT</th>
           <td style="padding: 0 5px"> : </td>
           <td><small>Rp.</small> {{amountTotal}}</td>
         </tr>
       </table>
-      <div  align="right" 
+      <div  align="right"
         :style="`
           font-family: ${po.font.two};
           font-size: 14px;
@@ -83,10 +88,10 @@
           margin-top: 15px;
           width: ${po.width};
         `">
-        
+
         <div style="width:300px; margin-left: 10%">
           <div align="center">
-            Denpasar, {{today}}
+            ${po.store.city}, {{today}}
           <br/>
             Recipient
           <br/><br/><br/><br/>
@@ -127,7 +132,8 @@ export default {
       dateFrom: '',
       dateTo: '',
       amountTotal: 0,
-      customer: ''
+      customer: '',
+      customerAlamat: '',
     };
   },
   watch: {
@@ -137,6 +143,7 @@ export default {
       this.dateFrom = this.$date.formatDate(this.data.from, 'DD/MM/YYYY')
       this.dateTo = this.$date.formatDate(this.data.to, 'DD/MM/YYYY')
       this.customer = this.data.customer
+      this.customerAlamat = this.data.customerAlamat
     }
   },
   methods: {

@@ -51,8 +51,8 @@
         </div>
       </template>
     </x-table>
-    <print-out 
-      ref="printer" 
+    <print-out
+      ref="printer"
       :data="printData"
     />
   </q-page>
@@ -83,7 +83,7 @@ export default {
           { name: 'total', field: 'total', label: 'Total', type: 'decimal'},
           { name: 'lunas', field: 'lunas', label: 'Status', type: 'enum', options: [
             {label: 'Lunas', value: 1},{label: 'Belum Lunas', value: 0},{label: 'Jatuh Tempo', value: 2},
-          ]}, 
+          ]},
         ],
         pagination: {
           rowsPerPage: 0
@@ -109,12 +109,12 @@ export default {
           {label: 'Cash', value: 'cash'},
           {label: 'Credit', value: 'credit'},
         ],
-      }
+      },
     }
   },
   computed: {
     loading() {
-      return this.$store.state.loading 
+      return this.$store.state.loading
     },
     customerData() {
       return this.table.customer
@@ -130,8 +130,8 @@ export default {
         total: this.totalSelected,
         from: this.filterDari,
         to: this.filterSampai,
-        customer: this.table.customer.label
-
+        customer: this.table.customer.label,
+        customerAlamat: this.table.customer.alamat,
       }
     }
   },
@@ -209,7 +209,7 @@ export default {
         tanggal: this.$date.formatDate(Date(),'YYYY/MM/DD'),
         detail: this.table.selected.map((v) => {
           return {
-            id_order: v.id, 
+            id_order: v.id,
           }
         }),
       }
@@ -245,15 +245,15 @@ export default {
   .q-table th
     opacity: 1 !important
 
-  .q-item__section--main ~ .q-item__section--side 
+  .q-item__section--main ~ .q-item__section--side
     align-items: flex-end
     padding-right: 0
     padding-left: 1px
-  
-  input[type=number]::-webkit-inner-spin-button, 
-  input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none; 
-    margin-right: 2px; 
+
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin-right: 2px;
   }
 
 </style>

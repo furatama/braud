@@ -12,7 +12,7 @@
       binary-state-sort
       :rows-per-page-options="rpp"
       class="bg-secondary text-anti-primary"
-      table-class="no-scroll bg-accent text-primary"
+      table-class="bg-accent text-primary"
       :hide-header="true"
     >
       <template v-slot:top-right>

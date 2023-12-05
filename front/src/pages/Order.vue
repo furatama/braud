@@ -27,7 +27,7 @@ export default {
         { name: 'no', label: 'No Order', type: 'string'},
         { name: 'customer', label: 'Customer', type: 'string'},
         { name: 'metode', label: 'Metode', type: 'enum', options: [
-          {label: 'Cash', value: 'cash'},{label: 'Credit', value: 'credit'},
+          {label: 'Cash', value: 'cash'},{label: 'Credit', value: 'credit'},{label: 'Transfer', value: 'transfer'},
         ]},
         { name: 'total', label: 'Total', type: 'decimal'},
         { name: 'tunai', label: 'Terbayar', type: 'decimal'},
@@ -58,7 +58,7 @@ export default {
     },
     // onRequest (props) {
     //   let { page, rowsPerPage, rowsNumber, sortBy, descending } = props.pagination
-    //   let colFilter = {} 
+    //   let colFilter = {}
     //   let cols = props.cols || this.cols)
     //   cols.forEach((el) => {
     //     if (el.type && el.type != 'dialog')
@@ -72,7 +72,7 @@ export default {
     //       this.nomor = tabledata.from
     //       props.pagination.page = tabledata.current_page
     //       props.pagination.rowsPerPage = tabledata.per_page
-    //       props.pagination.rowsNumber = tabledata.total          
+    //       props.pagination.rowsNumber = tabledata.total
     //     }).catch((error) => {
     //       console.log(error)
     //       this.$notifyNegative('Ada Sebuah Kesalahan')

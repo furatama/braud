@@ -38,7 +38,8 @@ export default function (/* { ssrContext } */) {
           name: LocalStorage.getItem('psn') || 'UD. Ladang Roti',
           address: LocalStorage.getItem('psa') || 'Jl. Pulau Morotai 45, Denpasar, Bali',
           phone: LocalStorage.getItem('psp') || '+6282 237 810 111',
-          email: LocalStorage.getItem('pse') || 'braud.artisanbakery@gmail.com'
+          email: LocalStorage.getItem('pse') || 'braud.artisanbakery@gmail.com',
+          city: LocalStorage.getItem('psc') || 'Denpasar'
         },
         width: LocalStorage.getItem('pw') || "80%",
         rows: LocalStorage.getItem('pr') || 20,
@@ -90,7 +91,7 @@ export default function (/* { ssrContext } */) {
         this.$router.push({
           path: '/'
         })
-      },      
+      },
       removeAuth (state) {
         state.auth = {
           token: '',
@@ -101,10 +102,10 @@ export default function (/* { ssrContext } */) {
         this.$router.push({
           path: '/login'
         })
-      },      
+      },
       loadingStart (state) {
         state.loading = true
-      },      
+      },
       loadingEnd (state) {
         state.loading = false
       },
@@ -193,7 +194,7 @@ export default function (/* { ssrContext } */) {
           }).then((response) => {
             const data = response.data
             if (data.status == "success") {
-              commit('applyAuth', {token: data.data.access_token})  
+              commit('applyAuth', {token: data.data.access_token})
               dispatch('validateToken',true)
               resolve(data)
             } else {

@@ -14,10 +14,10 @@
         </q-btn>
 
         <q-toolbar-title>
-          Braud Artisan Bakery
+          Braud
         </q-toolbar-title>
 
-        <div>v1.8.0422</div>
+        <div>v1.9.0223</div>
       </q-toolbar>
     </q-header>
 

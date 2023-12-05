@@ -46,6 +46,7 @@
       <q-input outlined v-model="printout.store.address" label="Alamat Usaha"/>
       <q-input outlined v-model="printout.store.phone" label="Telpon Usaha"/>
       <q-input outlined v-model="printout.store.email" label="Email Usaha"/>
+      <q-input outlined v-model="printout.store.city" label="Kota Usaha"/>
       <span class="text-underline">Printout Kasir</span>
       <q-input autogrow outlined v-model="printout.notabene" label="Nota Printout Kasir"/>
       <span class="text-underline">Printout Invoice</span>
@@ -75,7 +76,7 @@ export default {
   computed: {
     loading: {
       get() {
-        return this.$store.state.loading 
+        return this.$store.state.loading
       }
     },
     // printout() {
@@ -144,7 +145,8 @@ export default {
           address: this.printout.store.address,
           phone: this.printout.store.phone,
           email: this.printout.store.email,
-        }, 
+          city: this.printout.store.city,
+        },
         styles: this.printout.styles,
         notabene: this.printout.notabene,
         notabenei: this.printout.notabenei,
@@ -170,6 +172,7 @@ export default {
         address: this.$store.state.printout.store.address,
         phone: this.$store.state.printout.store.phone,
         email: this.$store.state.printout.store.email,
+        city: this.$store.state.printout.store.city,
       },
       styles: this.$store.state.printout.styles,
       notabene: this.$store.state.printout.notabene,

@@ -1,0 +1,117 @@
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes noticeIn {
+    0% { margin-top: -100px; }
+    100% { margin-top: 0px; }
+}
+
+@keyframes noticeOut {
+    0% { margin-top: 0px; }
+    100% { margin-top: -100px; }
+}
+
+* {
+    scrollbar-width: thin;
+    scroll-behavior: smooth;
+}
+
+*::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #a39690;
+    color: #000;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 1.42857143;
+    margin: 8px;
+}
+
+.container {
+    /* text-align: center; */
+}
+
+.notice {
+    background: rgba(255, 0, 0, 0.75);
+    color: #fff;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.5em;
+}
+
+.notice-in {
+    animation: noticeIn 0.5s linear;
+    -webkit-animation: noticeIn 0.5s linear;
+}
+
+.notice-out {
+    animation: noticeOut 0.5s linear;
+    -webkit-animation: noticeOut 0.5s linear;
+}
+
+.b-badge {
+    border-radius: 15px;
+    color: #fff;
+    display: inline-block;
+    font-size: 0.65em;
+    line-height: 1;
+    padding: 5px 7px;
+    margin-right: 2px;
+    text-align: center;
+    vertical-align: top;
+}
+
+.b-item {
+    border-radius: 3px;
+    color: #000;
+    display: inline-block;
+    line-height: 1;
+    padding: 8px 3px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    text-align: center;
+    vertical-align: baseline;
+    animation: fadeIn 1s;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.bv-1 {
+    background-color: #D3EBB6;
+    border: 1px solid #008834;
+}
+
+.bv-1 > .b-badge {
+    background-color: #008834;
+}
+
+.bv-2 {
+    background-color: #B6D3EB;
+    border: 1px solid #003b88;
+}
+
+.bv-2 > .b-badge {
+    background-color: #003b88;
+}
+
+.bv-3 {
+    background-color: #EBD3B6;
+    border: 1px solid #884900;
+}
+
+.bv-3 > .b-badge {
+    background-color: #884900;
+}

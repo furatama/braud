@@ -91,7 +91,7 @@
 
         <div style="width:300px; margin-left: 10%">
           <div align="center">
-            ${po.store.city}, {{today}}
+            {{po.store.city}}, {{today}}
           <br/>
             Recipient
           <br/><br/><br/><br/>

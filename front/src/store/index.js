@@ -133,6 +133,8 @@ export default function (/* { ssrContext } */) {
         LocalStorage.set('psp', payload.store.phone)
         state.printout.store.email = payload.store.email
         LocalStorage.set('pse', payload.store.email)
+        state.printout.store.city = payload.store.city
+        LocalStorage.set('psc', payload.store.city)
 
         state.printout.styles = payload.styles
         LocalStorage.set('ps', payload.styles)

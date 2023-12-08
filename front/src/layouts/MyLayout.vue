@@ -17,7 +17,7 @@
           Braud
         </q-toolbar-title>
 
-        <div>v1.9.0223</div>
+        <div>v1.9.1223</div>
       </q-toolbar>
     </q-header>
 

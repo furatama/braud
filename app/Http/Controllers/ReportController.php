@@ -22,7 +22,11 @@ class ReportController extends Controller
         $to = $request->input('to',null);
         $customer = $request->input('customer',null);
         $data = Report::customerproduk($method,$from,$to,$customer);
-        return bd_json(Report::envelop($data));
+        if ($method == 'a') {
+            return bd_json(Report::envelop($data));
+        } else {
+            return bd_json($data, [], 2);
+        }
     }
 
     public function produk(Request $request) {

@@ -1,12 +1,49 @@
 <?php
 
+if (!function_exists('paginateV2')) {
+  function paginateV2($data) {
+    $paginate = (int) request('paginate');
+    $page = (int) request('page');
+    $cursorCnt = 0;
+    $fetchFrom = $paginate * ($page - 1);
+    $fetchTo = $paginate * $page;
+    $payload_data = [];
+    if ($fetchTo > count($data)) {
+      $fetchTo = count($data);
+      $fetchFrom = $fetchTo - $paginate;
+      $page = ceil($fetchTo / $paginate);
+    }
+    foreach ($data as $key => $value) {
+      if ($cursorCnt >= $fetchFrom && $cursorCnt < $fetchTo) {
+        $payload_data[] = $value;
+      }
+      $cursorCnt++;
+    }
+    $payload = [
+      'data' => [
+        'current_page' => $page,
+        'from' => $fetchFrom + 1,
+        'last_page' => ceil($cursorCnt / $paginate),
+        'to' => (int) $fetchTo,
+        'total' => (int) $cursorCnt,
+        'per_page' => $paginate,
+        'data' => $payload_data
+      ]
+    ];
+    return $payload;
+  }
+}
+
 if (! function_exists('bd_json')) {
-  function bd_json($data, $additionalData = []) {
+  function bd_json($data, $additionalData = [], $paginateV = 1) {
     $json = [];
     $paginate = request('paginate');
     $sortBy = request('sortBy');
     $descending = request('descending');
     if ($data !== null) {
+      if ($paginateV == 2) {
+        $data = paginateV2($data);
+      }
       if (is_array($data)) {
         return jsend_success($data);
       }

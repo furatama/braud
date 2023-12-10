@@ -166,7 +166,7 @@ export default {
         console.log(this.aFilters)
       // }, 500);
     },
-    onRequest (props = null) {
+    onRequest (props = null, fromCacheOnly = false) {
       console.log(props, this.pFilters)
       let pagination = props && props.hasOwnProperty('pagination') ? props.pagination : this.pagination
       let params = {
@@ -189,6 +189,7 @@ export default {
         this.pagination.descending = pagination.descending
         this.reformat()
       }
+      if (fromCacheOnly) return
       this.$store.dispatch("fetchPaginate",{url: this.resourceURL, pagination, params})
         .then((data) => {
           let tabledata = data.data
@@ -294,7 +295,7 @@ export default {
     })
   },
   mounted() {
-    this.onRequest()
+    this.onRequest(null, true)
   },
 }
 </script>

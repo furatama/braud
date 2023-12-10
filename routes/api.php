@@ -20,7 +20,7 @@ Route::group([
 
 //taruh Route di luar sini untuk yang tidak perlu authentikasi
 Route::get('data', function() {
-    echo "asdf";
+    echo "assssdf";
 });
 
 //Buat beberapa route:group untuk hak akses yang berbeda2 pisahkan dengan | jika ada 2 atau lebih hak akses yang dapat menggunakannya
